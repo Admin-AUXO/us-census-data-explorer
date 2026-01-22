@@ -6,6 +6,47 @@
           <AuxoLogo size="small" />
           <div class="brand-separator"></div>
           <h1 class="app-title">USA Census Data Explorer</h1>
+          <div class="header-breadcrumbs">
+            <button
+              v-if="store.currentLevel !== 'state'"
+              class="btn-back"
+              @click="store.goBack()"
+              aria-label="Go back"
+            >
+              <ChevronLeft :size="14" />
+              <span>Back</span>
+            </button>
+            <nav class="breadcrumb-nav">
+              <button
+                class="breadcrumb-link"
+                :class="{ 'active': store.currentLevel === 'state' }"
+                @click="store.reset()"
+              >
+                <Globe :size="12" />
+                <span>United States</span>
+              </button>
+              <ChevronRight v-if="store.currentState" :size="10" class="breadcrumb-sep" />
+              <button
+                v-if="store.currentState"
+                class="breadcrumb-link"
+                :class="{ 'active': store.currentLevel === 'county' }"
+                @click="navigateToState"
+              >
+                <MapPin :size="12" />
+                <span>{{ store.currentState }}</span>
+              </button>
+              <ChevronRight v-if="store.currentCounty" :size="10" class="breadcrumb-sep" />
+              <button
+                v-if="store.currentCounty"
+                class="breadcrumb-link"
+                :class="{ 'active': store.currentLevel === 'zcta5' }"
+                disabled
+              >
+                <Building :size="12" />
+                <span>{{ store.currentCounty }}</span>
+              </button>
+            </nav>
+          </div>
         </div>
         <div class="header-controls">
           <button 
@@ -33,50 +74,6 @@
             <HelpCircle :size="18" />
             <span>Help</span>
           </button>
-        </div>
-      </div>
-
-      <div class="header-nav">
-        <div class="nav-breadcrumbs">
-          <button
-            v-if="store.currentLevel !== 'state'"
-            class="btn-back"
-            @click="store.goBack()"
-            aria-label="Go back"
-          >
-            <ChevronLeft :size="16" />
-            <span>Back</span>
-          </button>
-          <nav class="breadcrumb-nav">
-            <button
-              class="breadcrumb-link"
-              :class="{ 'active': store.currentLevel === 'state' }"
-              @click="store.reset()"
-            >
-              <Globe :size="14" />
-              <span>United States</span>
-            </button>
-            <ChevronRight v-if="store.currentState" :size="12" class="breadcrumb-sep" />
-            <button
-              v-if="store.currentState"
-              class="breadcrumb-link"
-              :class="{ 'active': store.currentLevel === 'county' }"
-              @click="navigateToState"
-            >
-              <MapPin :size="14" />
-              <span>{{ store.currentState }}</span>
-            </button>
-            <ChevronRight v-if="store.currentCounty" :size="12" class="breadcrumb-sep" />
-            <button
-              v-if="store.currentCounty"
-              class="breadcrumb-link"
-              :class="{ 'active': store.currentLevel === 'zcta5' }"
-              disabled
-            >
-              <Building :size="14" />
-              <span>{{ store.currentCounty }}</span>
-            </button>
-          </nav>
         </div>
       </div>
 
@@ -450,6 +447,14 @@ watch(() => selectedYear.value, () => {
   letter-spacing: -0.01em;
 }
 
+.header-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+}
+
 .header-controls {
   display: flex;
   align-items: center;
@@ -536,32 +541,22 @@ watch(() => selectedYear.value, () => {
   color: var(--accent-green);
 }
 
-.header-nav {
-  padding: 0.5rem clamp(1rem, 4vw, 3rem);
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.nav-breadcrumbs {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
 
 .btn-back {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
   background: var(--accent-green);
   color: var(--text-on-accent);
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   cursor: pointer;
   transition: all var(--duration-fast) var(--easing-standard);
   white-space: nowrap;
+  height: 1.75rem;
 }
 
 .btn-back:hover {
@@ -573,24 +568,25 @@ watch(() => selectedYear.value, () => {
 .breadcrumb-nav {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
   flex-wrap: wrap;
 }
 
 .breadcrumb-link {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--duration-fast) var(--easing-standard);
   white-space: nowrap;
+  height: 1.75rem;
 }
 
 .breadcrumb-link:hover:not(:disabled) {
@@ -744,9 +740,6 @@ watch(() => selectedYear.value, () => {
     padding: 0.5rem 1.25rem;
   }
 
-  .header-nav {
-    padding: 0.375rem 1.25rem;
-  }
 
   .header-filters-bar {
     padding: 0.625rem 1.25rem;
@@ -778,14 +771,10 @@ watch(() => selectedYear.value, () => {
     flex-wrap: wrap;
   }
 
-  .header-nav {
-    padding: 0.5rem 1rem;
-  }
-
-  .nav-breadcrumbs {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+  .header-breadcrumbs {
+    margin-left: 0;
+    margin-top: 0.25rem;
+    width: 100%;
   }
 
   .btn-back {

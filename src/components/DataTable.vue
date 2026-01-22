@@ -67,14 +67,13 @@
             <th v-if="store.currentLevel === 'state'" class="col-count">ZIP Codes</th>
           </tr>
         </thead>
-        <tbody>
-          <TransitionGroup name="table-row" tag="tbody">
-            <tr
-              v-for="(row, index) in sortedData"
-              :key="getRowKey(row, index)"
-              :class="getRowClass(row)"
-              @click="handleRowClick(row)"
-            >
+        <TransitionGroup name="table-row" tag="tbody">
+          <tr
+            v-for="(row, index) in sortedData"
+            :key="getRowKey(row, index)"
+            :class="getRowClass(row)"
+            @click="handleRowClick(row)"
+          >
             <td class="primary-col col-state">
               {{ getPrimaryValue(row) }}
               <span v-if="isMaxValue(row)" class="value-badge badge-top">Top</span>
@@ -114,8 +113,7 @@
               {{ getZipCount(row) }}
             </td>
           </tr>
-          </TransitionGroup>
-        </tbody>
+        </TransitionGroup>
       </table>
     </div>
   </div>

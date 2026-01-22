@@ -529,6 +529,7 @@ export const useCensusStore = defineStore('census', () => {
     dimensionFilters.metricValueMax = null
   }
 
+  let filterTimeout = null
   watch(() => [
     dimensionFilters.selectedStates,
     dimensionFilters.selectedRegions,
@@ -544,10 +545,12 @@ export const useCensusStore = defineStore('census', () => {
     dimensionFilters.metricValueMin,
     dimensionFilters.metricValueMax
   ], () => {
+    if (filterTimeout) clearTimeout(filterTimeout)
     isFiltering.value = true
-    setTimeout(() => {
+    filterTimeout = setTimeout(() => {
       isFiltering.value = false
-    }, 300)
+      filterTimeout = null
+    }, 150)
   }, { deep: true })
 
   const preloadNextLevel = async () => {

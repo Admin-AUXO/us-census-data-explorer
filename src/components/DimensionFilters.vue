@@ -1621,6 +1621,7 @@ input.search-input:-ms-input-placeholder {
 .sidebar-enter-active .sidebar-panel,
 .sidebar-leave-active .sidebar-panel {
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: transform;
 }
 
 .sidebar-enter-from {

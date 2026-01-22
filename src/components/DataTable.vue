@@ -360,7 +360,11 @@ const getChildCount = (row) => {
 
 const getZipCount = (row) => {
   if (store.currentLevel === 'state') {
-    return store.data.zcta5?.filter(z => z.state_name === row.state_name).length || 0
+    if (!store.data.zcta5 || store.data.zcta5.length === 0) {
+      return 'N/A'
+    }
+    const count = store.data.zcta5.filter(z => z.state_name === row.state_name).length
+    return count > 0 ? count : 0
   }
   return 0
 }

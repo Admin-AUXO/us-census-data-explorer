@@ -81,18 +81,19 @@ export const useCensusStore = defineStore('census', () => {
         break
     }
 
-    if (!dataset || dataset.length === 0) return null
+    if (!dataset || !Array.isArray(dataset) || dataset.length === 0) return null
 
     let filtered = dataset
     const level = currentLevel.value
     const filters = dimensionFilters
     const query = searchQuery.value?.toLowerCase() || ''
 
-    const populationCol = dataset[0] ? (
-      dataset[0].total_population_2024 || 
-      dataset[0].total_population_2023 ||
-      dataset[0].total_population_2022 ||
-      Object.keys(dataset[0]).find(k => k.includes('total_population'))
+    const firstRow = dataset[0]
+    const populationCol = firstRow && typeof firstRow === 'object' && firstRow !== null ? (
+      firstRow.total_population_2024 || 
+      firstRow.total_population_2023 ||
+      firstRow.total_population_2022 ||
+      (Object.keys(firstRow).find(k => k.includes('total_population')) || null)
     ) : null
 
     const popMin = filters.populationMin !== null && filters.populationMin !== '' ? parseFloat(filters.populationMin) : null
@@ -103,9 +104,11 @@ export const useCensusStore = defineStore('census', () => {
     const metricMax = currentMetric.value && filters.metricValueMax !== null && filters.metricValueMax !== '' ? parseFloat(filters.metricValueMax) : null
 
     filtered = filtered.filter(d => {
+      if (!d || typeof d !== 'object') return false
+      
       if (level === 'state') {
-        if (filters.selectedStates.length > 0) {
-          const allStates = new Set(dataset.map(item => item.state_name).filter(Boolean))
+        if (filters.selectedStates.length > 0 && dataset && Array.isArray(dataset)) {
+          const allStates = new Set(dataset.map(item => item?.state_name).filter(Boolean))
           if (filters.selectedStates.length < allStates.size && !filters.selectedStates.includes(d.state_name)) {
             return false
           }
@@ -175,10 +178,10 @@ export const useCensusStore = defineStore('census', () => {
         if (val > metricMax) return false
       }
 
-      if (query) {
+      if (query && d && typeof d === 'object') {
         let found = false
         for (const key in d) {
-          if (String(d[key]).toLowerCase().includes(query)) {
+          if (d.hasOwnProperty(key) && String(d[key]).toLowerCase().includes(query)) {
             found = true
             break
           }
@@ -218,8 +221,10 @@ export const useCensusStore = defineStore('census', () => {
   }
   
   const availableYears = computed(() => {
-    if (!data.value.state || data.value.state.length === 0) return []
-    const columns = Object.keys(data.value.state[0])
+    if (!data.value.state || !Array.isArray(data.value.state) || data.value.state.length === 0) return []
+    const firstRow = data.value.state[0]
+    if (!firstRow || typeof firstRow !== 'object' || firstRow === null) return []
+    const columns = Object.keys(firstRow)
     const yearMatches = columns
       .map(col => col.match(/_(\d{4})$/))
       .filter(match => match)

@@ -427,10 +427,11 @@ const geoInfo = computed(() => {
   let urbanCount = 0
   let ruralCount = 0
 
-  const popCol = store.filteredData[0]?.total_population_2024 || 
-                 store.filteredData[0]?.total_population_2023 ||
-                 store.filteredData[0]?.total_population_2022 ||
-                 Object.keys(store.filteredData[0] || {}).find(k => k.includes('total_population'))
+  const firstRow = store.filteredData && store.filteredData.length > 0 ? store.filteredData[0] : null
+  const popCol = firstRow?.total_population_2024 || 
+                 firstRow?.total_population_2023 ||
+                 firstRow?.total_population_2022 ||
+                 (firstRow && typeof firstRow === 'object' ? Object.keys(firstRow).find(k => k.includes('total_population')) : null)
 
   store.filteredData.forEach(row => {
     if (popCol && row[popCol]) {

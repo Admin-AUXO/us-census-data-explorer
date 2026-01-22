@@ -200,7 +200,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useCensusStore } from '../stores/census'
 import { Database, Calendar, TrendingUp, GitCompare, Search, X, HelpCircle, ChevronLeft, ChevronRight, Globe, MapPin, Building, Map, Layers, Filter } from 'lucide-vue-next'
 import AuxoLogo from './AuxoLogo.vue'

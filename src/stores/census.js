@@ -27,9 +27,17 @@ export const useCensusStore = defineStore('census', () => {
   const dimensionFilters = ref({
     selectedStates: [],
     selectedRegions: [],
+    selectedDivisions: [],
     selectedCongressionalDistricts: [],
     selectedAiannh: [],
-    selectedUrbanRural: []
+    selectedUrbanRural: [],
+    selectedMetroAreas: [],
+    populationMin: null,
+    populationMax: null,
+    areaMin: null,
+    areaMax: null,
+    metricValueMin: null,
+    metricValueMax: null
   })
   
   const filtersExpanded = ref(false)
@@ -74,6 +82,12 @@ export const useCensusStore = defineStore('census', () => {
           return dimensionFilters.value.selectedRegions.includes(regionName)
         })
       }
+      if (dimensionFilters.value.selectedDivisions.length > 0) {
+        filtered = filtered.filter(d => {
+          const divisionName = getDivisionName(d.census_division)
+          return dimensionFilters.value.selectedDivisions.includes(divisionName)
+        })
+      }
     } else if (currentLevel.value === 'county') {
       if (dimensionFilters.value.selectedCongressionalDistricts.length > 0) {
         filtered = filtered.filter(d => {
@@ -93,6 +107,80 @@ export const useCensusStore = defineStore('census', () => {
           return dimensionFilters.value.selectedUrbanRural.includes(ur)
         })
       }
+      if (dimensionFilters.value.selectedMetroAreas.length > 0) {
+        filtered = filtered.filter(d => {
+          const metro = d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : 'N/A')
+          return dimensionFilters.value.selectedMetroAreas.includes(metro)
+        })
+      }
+    } else if (currentLevel.value === 'zcta5') {
+      if (dimensionFilters.value.selectedUrbanRural.length > 0) {
+        filtered = filtered.filter(d => {
+          const ur = d.urban_rural || 'N/A'
+          return dimensionFilters.value.selectedUrbanRural.includes(ur)
+        })
+      }
+      if (dimensionFilters.value.selectedAiannh.length > 0) {
+        filtered = filtered.filter(d => {
+          const aiannh = d.aiannh_name || 'N/A'
+          return dimensionFilters.value.selectedAiannh.includes(aiannh)
+        })
+      }
+      if (dimensionFilters.value.selectedMetroAreas.length > 0) {
+        filtered = filtered.filter(d => {
+          const metro = d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : 'N/A')
+          return dimensionFilters.value.selectedMetroAreas.includes(metro)
+        })
+      }
+    }
+
+    if (dimensionFilters.value.populationMin !== null && dimensionFilters.value.populationMin !== '') {
+      const popCol = filtered[0]?.total_population_2024 || 
+                     filtered[0]?.total_population_2023 ||
+                     filtered[0]?.total_population_2022 ||
+                     Object.keys(filtered[0] || {}).find(k => k.includes('total_population'))
+      if (popCol) {
+        filtered = filtered.filter(d => {
+          const pop = parseFloat(d[popCol]) || 0
+          return pop >= parseFloat(dimensionFilters.value.populationMin)
+        })
+      }
+    }
+    if (dimensionFilters.value.populationMax !== null && dimensionFilters.value.populationMax !== '') {
+      const popCol = filtered[0]?.total_population_2024 || 
+                     filtered[0]?.total_population_2023 ||
+                     filtered[0]?.total_population_2022 ||
+                     Object.keys(filtered[0] || {}).find(k => k.includes('total_population'))
+      if (popCol) {
+        filtered = filtered.filter(d => {
+          const pop = parseFloat(d[popCol]) || 0
+          return pop <= parseFloat(dimensionFilters.value.populationMax)
+        })
+      }
+    }
+    if (dimensionFilters.value.areaMin !== null && dimensionFilters.value.areaMin !== '') {
+      filtered = filtered.filter(d => {
+        const area = parseFloat(d.land_area_sq_km) || 0
+        return area >= parseFloat(dimensionFilters.value.areaMin)
+      })
+    }
+    if (dimensionFilters.value.areaMax !== null && dimensionFilters.value.areaMax !== '') {
+      filtered = filtered.filter(d => {
+        const area = parseFloat(d.land_area_sq_km) || 0
+        return area <= parseFloat(dimensionFilters.value.areaMax)
+      })
+    }
+    if (currentMetric.value && dimensionFilters.value.metricValueMin !== null && dimensionFilters.value.metricValueMin !== '') {
+      filtered = filtered.filter(d => {
+        const val = parseFloat(d[currentMetric.value]) || 0
+        return val >= parseFloat(dimensionFilters.value.metricValueMin)
+      })
+    }
+    if (currentMetric.value && dimensionFilters.value.metricValueMax !== null && dimensionFilters.value.metricValueMax !== '') {
+      filtered = filtered.filter(d => {
+        const val = parseFloat(d[currentMetric.value]) || 0
+        return val <= parseFloat(dimensionFilters.value.metricValueMax)
+      })
     }
 
     if (searchQuery.value) {
@@ -115,6 +203,21 @@ export const useCensusStore = defineStore('census', () => {
       '4': 'West'
     }
     return regions[code] || 'N/A'
+  }
+  
+  const getDivisionName = (code) => {
+    const divisions = {
+      '1': 'New England',
+      '2': 'Middle Atlantic',
+      '3': 'East North Central',
+      '4': 'West North Central',
+      '5': 'South Atlantic',
+      '6': 'East South Central',
+      '7': 'West South Central',
+      '8': 'Mountain',
+      '9': 'Pacific'
+    }
+    return divisions[code] || 'N/A'
   }
   
   const availableYears = computed(() => {
@@ -312,9 +415,17 @@ export const useCensusStore = defineStore('census', () => {
     dimensionFilters.value = {
       selectedStates: [],
       selectedRegions: [],
+      selectedDivisions: [],
       selectedCongressionalDistricts: [],
       selectedAiannh: [],
-      selectedUrbanRural: []
+      selectedUrbanRural: [],
+      selectedMetroAreas: [],
+      populationMin: null,
+      populationMax: null,
+      areaMin: null,
+      areaMax: null,
+      metricValueMin: null,
+      metricValueMax: null
     }
   }
 
@@ -339,6 +450,7 @@ export const useCensusStore = defineStore('census', () => {
     filteredData,
     availableYears,
     getRegionName,
+    getDivisionName,
     getPreviousYear,
     setAutoCompareYear,
     resetFilters,

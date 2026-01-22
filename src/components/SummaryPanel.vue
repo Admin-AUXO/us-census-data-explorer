@@ -103,13 +103,13 @@
             </div>
             <div class="card-content">
               <div v-if="trendInfo.yoyChange !== null" class="metric-row">
-                <span class="metric-label">YoY Change</span>
+                <span class="metric-label">{{ trendInfo.changeLabel }}</span>
                 <span class="metric-value" :class="trendInfo.yoyChangeClass">
                   {{ trendInfo.yoyChange > 0 ? '+' : '' }}{{ trendInfo.yoyChange.toFixed(1) }}%
                 </span>
               </div>
-              <div v-if="trendInfo.avgAnnualGrowth !== null" class="metric-row">
-                <span class="metric-label">Avg Annual Growth</span>
+              <div v-if="trendInfo.avgAnnualGrowth !== null && trendInfo.showAvgGrowth" class="metric-row">
+                <span class="metric-label">{{ trendInfo.avgGrowthLabel }}</span>
                 <span class="metric-value" :class="trendInfo.avgGrowthClass">
                   {{ trendInfo.avgAnnualGrowth > 0 ? '+' : '' }}{{ trendInfo.avgAnnualGrowth.toFixed(1) }}%
                 </span>
@@ -437,8 +437,11 @@ const trendInfo = computed(() => {
     return {
       yoyChange: null,
       yoyChangeClass: '',
+      changeLabel: '',
       avgAnnualGrowth: null,
       avgGrowthClass: '',
+      avgGrowthLabel: '',
+      showAvgGrowth: false,
       trendDirection: null,
       trendClass: '',
       volatility: null
@@ -448,6 +451,11 @@ const trendInfo = computed(() => {
   const baseMetric = store.currentMetric.replace(/_\d{4}$/, '')
   const currentYear = parseInt(store.currentMetric.match(/_(\d{4})$/)?.[1] || '0')
   const compareYear = parseInt(store.compareYear)
+  const previousYear = store.getPreviousYear(store.currentYear)
+  const isPreviousYear = previousYear && compareYear.toString() === previousYear
+  const isPastYear = compareYear < currentYear
+  const isFutureYear = compareYear > currentYear
+  const yearsDiff = Math.abs(currentYear - compareYear)
   
   const values = store.filteredData
     .map(row => {
@@ -462,8 +470,11 @@ const trendInfo = computed(() => {
     return {
       yoyChange: null,
       yoyChangeClass: '',
+      changeLabel: '',
       avgAnnualGrowth: null,
       avgGrowthClass: '',
+      avgGrowthLabel: '',
+      showAvgGrowth: false,
       trendDirection: null,
       trendClass: '',
       volatility: null
@@ -471,7 +482,6 @@ const trendInfo = computed(() => {
   }
 
   const avgChange = values.reduce((sum, v) => sum + v.change, 0) / values.length
-  const yearsDiff = currentYear - compareYear
   const avgAnnualGrowth = yearsDiff > 0 ? avgChange / yearsDiff : avgChange
 
   const allYears = store.availableYears || []
@@ -503,11 +513,34 @@ const trendInfo = computed(() => {
     trendClass = 'change-negative'
   }
 
+  let changeLabel = 'Change'
+  if (isPreviousYear) {
+    changeLabel = 'YoY Change'
+  } else if (isPastYear) {
+    changeLabel = `Change vs ${compareYear}`
+  } else if (isFutureYear) {
+    changeLabel = `Change vs ${compareYear} (Future)`
+  } else {
+    changeLabel = `Change vs ${compareYear}`
+  }
+  
+  let avgGrowthLabel = 'Growth Rate'
+  if (yearsDiff === 1) {
+    avgGrowthLabel = isPastYear ? 'Annual Growth' : 'Annual Change'
+  } else if (yearsDiff > 1) {
+    avgGrowthLabel = isPastYear 
+      ? `Avg Growth (${yearsDiff} yrs)` 
+      : `Avg Change (${yearsDiff} yrs)`
+  }
+
   return {
     yoyChange: avgChange,
     yoyChangeClass: avgChange > 0 ? 'change-positive' : avgChange < 0 ? 'change-negative' : 'change-neutral',
+    changeLabel,
     avgAnnualGrowth,
     avgGrowthClass: avgAnnualGrowth > 0 ? 'change-positive' : avgAnnualGrowth < 0 ? 'change-negative' : 'change-neutral',
+    avgGrowthLabel,
+    showAvgGrowth: yearsDiff > 1,
     trendDirection,
     trendClass,
     volatility

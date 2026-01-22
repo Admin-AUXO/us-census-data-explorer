@@ -67,7 +67,7 @@
             <th v-if="store.currentLevel === 'state'" class="col-count">ZIP Codes</th>
           </tr>
         </thead>
-        <TransitionGroup name="table-row" tag="tbody">
+        <tbody>
           <tr
             v-for="(row, index) in sortedData"
             :key="getRowKey(row, index)"
@@ -113,7 +113,7 @@
               {{ getZipCount(row) }}
             </td>
           </tr>
-        </TransitionGroup>
+        </tbody>
       </table>
     </div>
   </div>
@@ -481,39 +481,6 @@ const exportCSV = () => {
   opacity: 0;
 }
 
-.table-row-enter-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.table-row-leave-active {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  position: absolute;
-  width: 100%;
-}
-
-.table-row-enter-from {
-  opacity: 0;
-  transform: translateY(-10px) scale(0.98);
-}
-
-.table-row-enter-to {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.table-row-leave-from {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.table-row-leave-to {
-  opacity: 0;
-  transform: translateY(10px) scale(0.98);
-}
-
-.table-row-move {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
 .heatmap-legend {
   animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);

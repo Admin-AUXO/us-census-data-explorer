@@ -424,7 +424,10 @@ const exportCSV = () => {
 <style scoped>
 .table-container {
   position: relative;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: visible;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table-container.filtering {

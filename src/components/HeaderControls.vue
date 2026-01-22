@@ -405,17 +405,17 @@ watch(() => selectedYear.value, () => {
 }
 
 .header-container {
-  max-width: var(--size-container-max);
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0;
-  width: 100%;
 }
 
 .header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.625rem 1.5rem;
+  padding: 0.625rem clamp(1rem, 4vw, 3rem);
   gap: 1rem;
   border-bottom: 1px solid var(--border-color);
 }
@@ -537,7 +537,7 @@ watch(() => selectedYear.value, () => {
 }
 
 .header-nav {
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem clamp(1rem, 4vw, 3rem);
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-color);
 }
@@ -618,7 +618,7 @@ watch(() => selectedYear.value, () => {
 }
 
 .header-filters-bar {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem clamp(1rem, 4vw, 3rem);
   background: var(--bg-card);
 }
 

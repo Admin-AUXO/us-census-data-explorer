@@ -128,7 +128,7 @@
   --size-scrollbar-small: 6px;
   --size-sidebar-width: 420px;
   --size-sidebar-width-mobile: 100vw;
-  --size-container-max: 1400px;
+  --size-container-max: 100%;
   --size-input-height: 2rem;
   --size-button-height-sm: 1.75rem;
   --size-button-height-md: 2rem;

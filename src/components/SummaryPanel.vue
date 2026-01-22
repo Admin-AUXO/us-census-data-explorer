@@ -41,10 +41,7 @@
               <div class="metric-row">
                 <span class="metric-label">With Data</span>
                 <span class="metric-value">{{ validDataCount.toLocaleString() }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">Coverage</span>
-                <span class="metric-value accent">{{ coveragePercent }}%</span>
+                <span class="metric-sublabel">({{ coveragePercent }}% coverage)</span>
               </div>
               <div v-if="geoInfo.totalPopulation" class="metric-row">
                 <span class="metric-label">Total Population</span>
@@ -65,7 +62,7 @@
           <div class="summary-card card-secondary">
             <div class="card-header">
               <Activity :size="20" />
-              <h3>Statistical Overview</h3>
+              <h3>Statistics & Distribution</h3>
             </div>
             <div class="card-content">
               <div class="metric-row">
@@ -75,6 +72,17 @@
               <div class="metric-row">
                 <span class="metric-label">Median</span>
                 <span class="metric-value">{{ formatValue(stats.median) }}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">Min / Max</span>
+                <span class="metric-value">
+                  <span class="text-blue">{{ formatValue(stats.min) }}</span> / 
+                  <span class="text-green">{{ formatValue(stats.max) }}</span>
+                </span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">Range</span>
+                <span class="metric-value">{{ formatValue(stats.range) }}</span>
               </div>
               <div class="metric-row">
                 <span class="metric-label">Std. Deviation</span>
@@ -87,63 +95,11 @@
             </div>
           </div>
 
-          <!-- Distribution Insights -->
-          <div class="summary-card card-tertiary">
-            <div class="card-header">
-              <PieChart :size="20" />
-              <h3>Distribution</h3>
-            </div>
-            <div class="card-content">
-              <div class="metric-row">
-                <span class="metric-label">Minimum</span>
-                <span class="metric-value text-blue">{{ formatValue(stats.min) }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">25th Percentile</span>
-                <span class="metric-value">{{ formatValue(stats.q1) }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">75th Percentile</span>
-                <span class="metric-value">{{ formatValue(stats.q3) }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">Maximum</span>
-                <span class="metric-value text-green">{{ formatValue(stats.max) }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Aggregates & Totals -->
-          <div class="summary-card card-accent">
-            <div class="card-header">
-              <Sigma :size="20" />
-              <h3>Aggregates</h3>
-            </div>
-            <div class="card-content">
-              <div class="metric-row">
-                <span class="metric-label">Total Sum</span>
-                <span class="metric-value bold">{{ formatValue(stats.sum) }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">Range</span>
-                <span class="metric-value">{{ formatValue(stats.range) }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">IQR (Q3 - Q1)</span>
-                <span class="metric-value">{{ formatValue(stats.iqr) }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">Skewness</span>
-                <span class="metric-value" :class="skewnessClass">{{ stats.skewness.toFixed(2) }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Trend Analysis -->
+          <!-- Trend & Aggregates -->
           <div class="summary-card card-trend">
             <div class="card-header">
               <TrendingUp :size="20" />
-              <h3>Trend Analysis</h3>
+              <h3>Trends & Aggregates</h3>
             </div>
             <div class="card-content">
               <div v-if="trendInfo.yoyChange !== null" class="metric-row">
@@ -164,9 +120,17 @@
                   {{ trendInfo.trendDirection }}
                 </span>
               </div>
-              <div v-if="trendInfo.volatility !== null" class="metric-row">
-                <span class="metric-label">Volatility</span>
-                <span class="metric-value">{{ trendInfo.volatility.toFixed(2) }}</span>
+              <div class="metric-row">
+                <span class="metric-label">Total Sum</span>
+                <span class="metric-value bold">{{ formatValue(stats.sum) }}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">IQR (Q3 - Q1)</span>
+                <span class="metric-value">{{ formatValue(stats.iqr) }}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">Skewness</span>
+                <span class="metric-value" :class="skewnessClass">{{ stats.skewness.toFixed(2) }}</span>
               </div>
             </div>
           </div>
@@ -220,14 +184,9 @@ import {
   ChevronDown,
   MapPin,
   Activity,
-  PieChart,
-  Sigma,
   Award,
   TrendingUp,
-  TrendingDown,
-  ArrowUp,
-  ArrowDown,
-  Minus
+  TrendingDown
 } from 'lucide-vue-next'
 
 const store = useCensusStore()
@@ -575,6 +534,16 @@ const trendInfo = computed(() => {
   gap: 1.5rem;
 }
 
+@media (min-width: 1200px) {
+  .summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .card-full {
+    grid-column: 1 / -1;
+  }
+}
+
 .summary-card {
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
@@ -700,6 +669,17 @@ const trendInfo = computed(() => {
 
 .metric-value.text-green {
   color: var(--accent-green);
+}
+
+.metric-value.text-blue {
+  color: #3b82f6;
+}
+
+.metric-sublabel {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-left: 0.5rem;
+  font-weight: 400;
 }
 
 .metric-value.change-positive {

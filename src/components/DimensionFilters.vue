@@ -4,9 +4,11 @@
       class="filters-toggle"
       @click="store.filtersExpanded = !store.filtersExpanded"
       :aria-expanded="store.filtersExpanded"
+      :class="{ 'has-active-filters': hasActiveFilters }"
     >
       <Filter :size="18" />
       <span>Dimension Filters</span>
+      <span v-if="hasActiveFilters" class="filter-badge">{{ activeFilterCount }}</span>
       <ChevronDown :size="16" :class="{ rotated: !store.filtersExpanded }" />
     </button>
 
@@ -14,7 +16,13 @@
       <div v-show="store.filtersExpanded" class="filters-content">
         <div v-if="store.currentLevel === 'state'" class="filter-section">
           <div class="filter-group">
-            <label>Regions</label>
+            <label class="filter-label">
+              <MapPin :size="16" />
+              <span>Regions</span>
+              <span v-if="store.dimensionFilters.selectedRegions.length > 0" class="filter-count">
+                ({{ store.dimensionFilters.selectedRegions.length }})
+              </span>
+            </label>
             <div class="filter-checkboxes">
               <label v-for="region in availableRegions" :key="region" class="checkbox-label">
                 <input
@@ -27,7 +35,13 @@
             </div>
           </div>
           <div class="filter-group">
-            <label>States</label>
+            <label class="filter-label">
+              <Globe :size="16" />
+              <span>States</span>
+              <span v-if="store.dimensionFilters.selectedStates.length > 0" class="filter-count">
+                ({{ store.dimensionFilters.selectedStates.length }})
+              </span>
+            </label>
             <div class="filter-multiselect">
               <select
                 multiple
@@ -44,6 +58,7 @@
                 @click="store.dimensionFilters.selectedStates = []"
                 class="clear-filter"
               >
+                <X :size="14" />
                 Clear
               </button>
             </div>
@@ -52,7 +67,13 @@
 
         <div v-if="store.currentLevel === 'county'" class="filter-section">
           <div class="filter-group">
-            <label>Urban/Rural</label>
+            <label class="filter-label">
+              <Building :size="16" />
+              <span>Urban/Rural</span>
+              <span v-if="store.dimensionFilters.selectedUrbanRural.length > 0" class="filter-count">
+                ({{ store.dimensionFilters.selectedUrbanRural.length }})
+              </span>
+            </label>
             <div class="filter-checkboxes">
               <label v-for="ur in availableUrbanRural" :key="ur" class="checkbox-label">
                 <input
@@ -65,7 +86,13 @@
             </div>
           </div>
           <div v-if="availableAiannh.length > 0" class="filter-group">
-            <label>AIANNH Areas</label>
+            <label class="filter-label">
+              <MapPin :size="16" />
+              <span>AIANNH Areas</span>
+              <span v-if="store.dimensionFilters.selectedAiannh.length > 0" class="filter-count">
+                ({{ store.dimensionFilters.selectedAiannh.length }})
+              </span>
+            </label>
             <div class="filter-multiselect">
               <select
                 multiple
@@ -82,12 +109,19 @@
                 @click="store.dimensionFilters.selectedAiannh = []"
                 class="clear-filter"
               >
+                <X :size="14" />
                 Clear
               </button>
             </div>
           </div>
           <div v-if="availableCongressionalDistricts.length > 0" class="filter-group">
-            <label>Congressional Districts</label>
+            <label class="filter-label">
+              <Map :size="16" />
+              <span>Congressional Districts</span>
+              <span v-if="store.dimensionFilters.selectedCongressionalDistricts.length > 0" class="filter-count">
+                ({{ store.dimensionFilters.selectedCongressionalDistricts.length }})
+              </span>
+            </label>
             <div class="filter-multiselect">
               <select
                 multiple
@@ -104,6 +138,7 @@
                 @click="store.dimensionFilters.selectedCongressionalDistricts = []"
                 class="clear-filter"
               >
+                <X :size="14" />
                 Clear
               </button>
             </div>
@@ -123,7 +158,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useCensusStore } from '../stores/census'
-import { Filter, ChevronDown } from 'lucide-vue-next'
+import { Filter, ChevronDown, MapPin, Globe, Building, Map, X } from 'lucide-vue-next'
 
 const store = useCensusStore()
 
@@ -193,6 +228,15 @@ const hasActiveFilters = computed(() => {
          filters.selectedAiannh.length > 0 ||
          filters.selectedUrbanRural.length > 0
 })
+
+const activeFilterCount = computed(() => {
+  const filters = store.dimensionFilters
+  return filters.selectedStates.length +
+         filters.selectedRegions.length +
+         filters.selectedCongressionalDistricts.length +
+         filters.selectedAiannh.length +
+         filters.selectedUrbanRural.length
+})
 </script>
 
 <style scoped>
@@ -205,9 +249,9 @@ const hasActiveFilters = computed(() => {
 .filters-toggle {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
   width: 100%;
-  padding: 0.625rem 1rem;
+  padding: 0.75rem 1rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -216,12 +260,35 @@ const hasActiveFilters = computed(() => {
   font-weight: 500;
   cursor: pointer;
   transition: all var(--duration-fast) var(--easing-standard);
+  position: relative;
 }
 
 .filters-toggle:hover {
   background: var(--bg-elevated);
   border-color: var(--accent-green);
   color: var(--accent-green);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filters-toggle.has-active-filters {
+  border-color: var(--accent-green);
+  background: rgba(163, 230, 53, 0.05);
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.375rem;
+  background: var(--accent-green);
+  color: var(--bg-card);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: auto;
 }
 
 .filters-toggle svg.rotated {
@@ -230,10 +297,11 @@ const hasActiveFilters = computed(() => {
 
 .filters-content {
   margin-top: 0.75rem;
-  padding: 1rem;
+  padding: 1.25rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .filter-section {
@@ -249,16 +317,36 @@ const hasActiveFilters = computed(() => {
   gap: 0.5rem;
 }
 
-.filter-group label {
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.filter-label svg {
+  color: var(--accent-green);
+  flex-shrink: 0;
+}
+
+.filter-count {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--accent-green);
+  margin-left: auto;
 }
 
 .filter-checkboxes {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.625rem;
+  padding: 0.5rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
 }
 
 .checkbox-label {
@@ -266,16 +354,30 @@ const hasActiveFilters = computed(() => {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.8125rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.checkbox-label:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
 }
 
 .checkbox-label input[type="checkbox"] {
-  width: 1rem;
-  height: 1rem;
+  width: 1.125rem;
+  height: 1.125rem;
   cursor: pointer;
   accent-color: var(--accent-green);
+  flex-shrink: 0;
+}
+
+.checkbox-label input[type="checkbox"]:checked + span {
+  color: var(--accent-green);
+  font-weight: 600;
 }
 
 .filter-multiselect {
@@ -292,28 +394,46 @@ const hasActiveFilters = computed(() => {
   color: var(--text-primary);
   font-size: 0.8125rem;
   min-height: 120px;
+  transition: all var(--duration-fast) var(--easing-standard);
 }
 
 .multiselect:focus {
   outline: none;
   border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.1);
+}
+
+.multiselect option:checked {
+  background: var(--accent-green) linear-gradient(0deg, var(--accent-green) 0%, var(--accent-green) 100%);
+  color: var(--bg-card);
+  font-weight: 600;
 }
 
 .clear-filter {
-  padding: 0.375rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: 0.75rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all var(--duration-fast) var(--easing-standard);
+  margin-top: 0.5rem;
 }
 
 .clear-filter:hover {
   background: var(--bg-surface);
   border-color: var(--accent-green);
   color: var(--accent-green);
+  transform: translateY(-1px);
+}
+
+.clear-filter svg {
+  flex-shrink: 0;
 }
 
 .filter-actions {
@@ -325,21 +445,26 @@ const hasActiveFilters = computed(() => {
 }
 
 .btn-reset-filters {
-  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all var(--duration-fast) var(--easing-standard);
 }
 
 .btn-reset-filters:hover {
   background: var(--bg-surface);
-  border-color: var(--accent-green);
-  color: var(--accent-green);
+  border-color: #ef4444;
+  color: #ef4444;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
 }
 
 .expand-enter-active,

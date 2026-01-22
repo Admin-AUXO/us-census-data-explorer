@@ -188,54 +188,44 @@ body {
   color: var(--accent-green);
 }
 
-.value-container {
+.change-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
 }
 
-.value-main {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--accent-green);
+.change-absolute {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-.value-change {
+.change-percent {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
 }
 
-.value-change.change-positive {
+.change-percent.change-positive {
   color: #10b981;
   background-color: rgba(16, 185, 129, 0.1);
 }
 
-.value-change.change-negative {
+.change-percent.change-negative {
   color: #ef4444;
   background-color: rgba(239, 68, 68, 0.1);
 }
 
-.value-change.change-neutral {
+.change-percent.change-neutral {
   color: #3b82f6;
   background-color: rgba(59, 130, 246, 0.1);
 }
 
-.data-table td.col-change.change-positive {
-  color: #10b981;
-  font-weight: 600;
-}
-
-.data-table td.col-change.change-negative {
-  color: #ef4444;
-  font-weight: 600;
-}
-
-.data-table td.col-change.change-neutral {
-  color: #3b82f6;
-  font-weight: 600;
+.data-table td.col-change {
+  text-align: center;
+  vertical-align: middle;
 }
 
 .data-table td.text-center {

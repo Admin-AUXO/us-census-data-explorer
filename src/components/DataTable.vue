@@ -71,15 +71,13 @@
               {{ formatArea(row.land_area_sq_km) }}
             </td>
             <td class="value-col col-value" :style="{ backgroundColor: getHeatColor(row) }">
-              <div class="value-container">
-                <div class="value-main">{{ formatValue(row[store.currentMetric]) }}</div>
-                <div v-if="hasComparison" :class="getChangeClass(row)" class="value-change">
-                  {{ formatChangePercent(row) }}
-                </div>
-              </div>
+              {{ formatValue(row[store.currentMetric]) }}
             </td>
-            <td v-if="hasComparison" :class="getChangeClass(row)" class="col-change">
-              {{ formatChangeAbsolute(row) }}
+            <td v-if="hasComparison" class="col-change">
+              <div class="change-container">
+                <div class="change-absolute">{{ formatChangeAbsolute(row) }}</div>
+                <div :class="['change-percent', getChangeClass(row)]">{{ formatChangePercent(row) }}</div>
+              </div>
             </td>
             <td v-if="store.currentLevel !== 'zcta5'" class="col-count">
               {{ getChildCount(row) }}
@@ -95,7 +93,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useCensusStore } from '../stores/census'
 
 const store = useCensusStore()

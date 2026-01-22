@@ -6,9 +6,7 @@
           <div class="logo-section">
             <AuxoLogo size="normal" />
             <span class="separator-pipe">|</span>
-            <div class="title-text">
-              <p class="subtitle">USA Census Data Explorer</p>
-            </div>
+            <p class="subtitle title-inline">USA Census Data Explorer</p>
           </div>
           <div class="breadcrumb-section">
             <button
@@ -448,12 +446,17 @@ watch(() => store.manifest, (manifest) => {
 .header-left {
   display: flex !important;
   align-items: center !important;
-  gap: var(--spacing-xs, 0.5rem) !important;
+  gap: var(--spacing-md, 1rem) !important;
   flex: 1 !important;
   min-width: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
   height: 100% !important;
+}
+
+.header-left > .logo-section {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
 }
 
 .logo-section {
@@ -463,11 +466,13 @@ watch(() => store.manifest, (manifest) => {
   padding: 0 !important;
   margin: 0 !important;
   margin-right: 0 !important;
+  flex-shrink: 0 !important;
 }
 
 .logo-section > * {
   margin-right: 0 !important;
   padding-right: 0 !important;
+  flex-shrink: 0 !important;
 }
 
 .logo-section > :deep(.auxo-logo-container) {
@@ -476,12 +481,16 @@ watch(() => store.manifest, (manifest) => {
   margin-right: 0 !important;
   padding-right: 0 !important;
   display: inline-flex !important;
+  width: auto !important;
+  max-width: 240px !important;
 }
 
 .logo-section > :deep(.auxo-logo-container) svg {
   margin: 0 !important;
   padding: 0 !important;
   display: block !important;
+  width: auto !important;
+  max-width: 240px !important;
 }
 
 .separator-pipe {
@@ -489,12 +498,13 @@ watch(() => store.manifest, (manifest) => {
   font-size: 0.875rem !important;
   font-weight: 300 !important;
   margin: 0 !important;
-  margin-left: 0.0625rem !important;
-  margin-right: 0.0625rem !important;
+  margin-left: 0.25rem !important;
+  margin-right: 0.25rem !important;
   padding: 0 !important;
   line-height: 1 !important;
   flex-shrink: 0 !important;
   display: inline-block !important;
+  width: auto !important;
 }
 
 .title-text {
@@ -517,6 +527,15 @@ watch(() => store.manifest, (manifest) => {
   letter-spacing: 0.5px;
   line-height: 1.2;
   white-space: nowrap;
+}
+
+.subtitle.title-inline {
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
 }
 
 .breadcrumb-section {

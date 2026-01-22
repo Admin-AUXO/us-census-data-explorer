@@ -38,9 +38,9 @@ const props = defineProps({
 
 const computedWidth = computed(() => {
   const sizes = {
-    small: 210,
-    normal: 280,
-    large: 420
+    small: 180,
+    normal: 240,
+    large: 360
   }
   return sizes[props.size] || sizes.normal
 })
@@ -65,6 +65,8 @@ const computedHeight = computed(() => {
   padding-right: 0 !important;
   line-height: 0 !important;
   vertical-align: middle !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
 }
 
 .auxo-logo-container svg {
@@ -76,6 +78,8 @@ const computedHeight = computed(() => {
   margin-right: 0 !important;
   padding-right: 0 !important;
   vertical-align: middle !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
 }
 
 @media (max-width: 768px) {

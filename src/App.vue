@@ -1,9 +1,19 @@
 <template>
   <div id="app">
-    <HeaderControls @show-help="showHelp = true" />
+    <HeaderControls @show-help="showHelp = true" @toggle-filters="filtersOpen = !filtersOpen" />
     <HelpPanel v-if="showHelp" @close="showHelp = false" />
+    <DimensionFilters :is-open="filtersOpen" @close="filtersOpen = false" />
 
-    <main class="main-content">
+    <Transition name="fade">
+      <div v-if="store.isLevelTransitioning" class="level-transition-overlay">
+        <div class="transition-loader">
+          <div class="loader-spinner"></div>
+          <p class="loader-text">Loading {{ nextLevelName }}...</p>
+        </div>
+      </div>
+    </Transition>
+
+    <main class="main-content" :class="{ 'with-sidebar': filtersOpen, 'transitioning': store.isLevelTransitioning }">
       <div class="container">
         <SummaryPanel />
 
@@ -74,16 +84,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useCensusStore } from './stores/census'
 import HeaderControls from './components/HeaderControls.vue'
 import DataTable from './components/DataTable.vue'
 import SummaryPanel from './components/SummaryPanel.vue'
 import HelpPanel from './components/HelpPanel.vue'
+import DimensionFilters from './components/DimensionFilters.vue'
 import { Database, MapPin, TrendingUp, BarChart, Info, ExternalLink } from 'lucide-vue-next'
 
 const store = useCensusStore()
 const showHelp = ref(false)
+const filtersOpen = ref(false)
+
+const nextLevelName = computed(() => {
+  if (store.currentLevel === 'state') return 'County Level'
+  if (store.currentLevel === 'county') return 'ZIP Code Level'
+  return 'Data'
+})
 
 const handleKeydown = (event) => {
   if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT') {
@@ -126,6 +144,82 @@ onUnmounted(() => {
 .main-content {
   flex: 1;
   padding: 1.5rem 0;
+  transition: margin-right var(--duration-normal) var(--easing-standard);
+}
+
+.main-content.with-sidebar {
+  margin-right: 0;
+}
+
+.main-content.transitioning {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+@media (min-width: 769px) {
+  .main-content.with-sidebar {
+    margin-right: 420px;
+  }
+}
+
+.level-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.transition-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--accent-green);
+  border-radius: 50%;
+  animation: spin 0.6s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.loader-text {
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .container {

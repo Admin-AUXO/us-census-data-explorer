@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import Papa from 'papaparse'
 
 export const useCensusStore = defineStore('census', () => {
@@ -21,10 +21,12 @@ export const useCensusStore = defineStore('census', () => {
   const sortColumn = ref(null)
   const sortDirection = ref('asc')
   const isLoading = ref(false)
+  const isLevelTransitioning = ref(false)
+  const isFiltering = ref(false)
   const manifest = ref(null)
   const searchQuery = ref('')
   
-  const dimensionFilters = ref({
+  const dimensionFilters = reactive({
     selectedStates: [],
     selectedRegions: [],
     selectedDivisions: [],
@@ -73,68 +75,74 @@ export const useCensusStore = defineStore('census', () => {
     let filtered = dataset
 
     if (currentLevel.value === 'state') {
-      if (dimensionFilters.value.selectedStates.length > 0) {
-        filtered = filtered.filter(d => dimensionFilters.value.selectedStates.includes(d.state_name))
+      const allStates = [...new Set(filtered.map(d => d.state_name).filter(Boolean))]
+      if (dimensionFilters.selectedStates.length > 0 && dimensionFilters.selectedStates.length < allStates.length) {
+        filtered = filtered.filter(d => dimensionFilters.selectedStates.includes(d.state_name))
       }
-      if (dimensionFilters.value.selectedRegions.length > 0) {
+      if (dimensionFilters.selectedRegions.length > 0) {
         filtered = filtered.filter(d => {
           const regionName = getRegionName(d.census_region)
-          return dimensionFilters.value.selectedRegions.includes(regionName)
+          return dimensionFilters.selectedRegions.includes(regionName)
         })
       }
-      if (dimensionFilters.value.selectedDivisions.length > 0) {
+      if (dimensionFilters.selectedDivisions.length > 0) {
         filtered = filtered.filter(d => {
           const divisionName = getDivisionName(d.census_division)
-          return dimensionFilters.value.selectedDivisions.includes(divisionName)
+          return dimensionFilters.selectedDivisions.includes(divisionName)
         })
       }
     } else if (currentLevel.value === 'county') {
-      if (dimensionFilters.value.selectedCongressionalDistricts.length > 0) {
+      const availableCDs = [...new Set(filtered.map(d => d.congressional_district || d.cd116 || '').filter(Boolean))]
+      if (availableCDs.length > 0 && dimensionFilters.selectedCongressionalDistricts.length > 0 && dimensionFilters.selectedCongressionalDistricts.length < availableCDs.length) {
         filtered = filtered.filter(d => {
           const cd = d.congressional_district || d.cd116 || ''
-          return dimensionFilters.value.selectedCongressionalDistricts.includes(cd)
+          return dimensionFilters.selectedCongressionalDistricts.includes(cd)
         })
       }
-      if (dimensionFilters.value.selectedAiannh.length > 0) {
+      const availableAiannh = [...new Set(filtered.map(d => d.aiannh_name || 'N/A').filter(a => a && a !== 'N/A'))]
+      if (availableAiannh.length > 0 && dimensionFilters.selectedAiannh.length > 0 && dimensionFilters.selectedAiannh.length < availableAiannh.length) {
         filtered = filtered.filter(d => {
           const aiannh = d.aiannh_name || 'N/A'
-          return dimensionFilters.value.selectedAiannh.includes(aiannh)
+          return dimensionFilters.selectedAiannh.includes(aiannh)
         })
       }
-      if (dimensionFilters.value.selectedUrbanRural.length > 0) {
+      if (dimensionFilters.selectedUrbanRural.length > 0) {
         filtered = filtered.filter(d => {
           const ur = d.urban_rural || 'N/A'
-          return dimensionFilters.value.selectedUrbanRural.includes(ur)
+          return dimensionFilters.selectedUrbanRural.includes(ur)
         })
       }
-      if (dimensionFilters.value.selectedMetroAreas.length > 0) {
+      const availableMetros = [...new Set(filtered.map(d => d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)).filter(Boolean))]
+      if (availableMetros.length > 0 && dimensionFilters.selectedMetroAreas.length > 0 && dimensionFilters.selectedMetroAreas.length < availableMetros.length) {
         filtered = filtered.filter(d => {
-          const metro = d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : 'N/A')
-          return dimensionFilters.value.selectedMetroAreas.includes(metro)
+          const metro = d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)
+          return dimensionFilters.selectedMetroAreas.includes(metro)
         })
       }
     } else if (currentLevel.value === 'zcta5') {
-      if (dimensionFilters.value.selectedUrbanRural.length > 0) {
+      if (dimensionFilters.selectedUrbanRural.length > 0) {
         filtered = filtered.filter(d => {
           const ur = d.urban_rural || 'N/A'
-          return dimensionFilters.value.selectedUrbanRural.includes(ur)
+          return dimensionFilters.selectedUrbanRural.includes(ur)
         })
       }
-      if (dimensionFilters.value.selectedAiannh.length > 0) {
+      const availableAiannh = [...new Set(filtered.map(d => d.aiannh_name || 'N/A').filter(a => a && a !== 'N/A'))]
+      if (availableAiannh.length > 0 && dimensionFilters.selectedAiannh.length > 0 && dimensionFilters.selectedAiannh.length < availableAiannh.length) {
         filtered = filtered.filter(d => {
           const aiannh = d.aiannh_name || 'N/A'
-          return dimensionFilters.value.selectedAiannh.includes(aiannh)
+          return dimensionFilters.selectedAiannh.includes(aiannh)
         })
       }
-      if (dimensionFilters.value.selectedMetroAreas.length > 0) {
+      const availableMetros = [...new Set(filtered.map(d => d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)).filter(Boolean))]
+      if (availableMetros.length > 0 && dimensionFilters.selectedMetroAreas.length > 0 && dimensionFilters.selectedMetroAreas.length < availableMetros.length) {
         filtered = filtered.filter(d => {
-          const metro = d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : 'N/A')
-          return dimensionFilters.value.selectedMetroAreas.includes(metro)
+          const metro = d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)
+          return dimensionFilters.selectedMetroAreas.includes(metro)
         })
       }
     }
 
-    if (dimensionFilters.value.populationMin !== null && dimensionFilters.value.populationMin !== '') {
+    if (dimensionFilters.populationMin !== null && dimensionFilters.populationMin !== '') {
       const popCol = filtered[0]?.total_population_2024 || 
                      filtered[0]?.total_population_2023 ||
                      filtered[0]?.total_population_2022 ||
@@ -142,11 +150,11 @@ export const useCensusStore = defineStore('census', () => {
       if (popCol) {
         filtered = filtered.filter(d => {
           const pop = parseFloat(d[popCol]) || 0
-          return pop >= parseFloat(dimensionFilters.value.populationMin)
+          return pop >= parseFloat(dimensionFilters.populationMin)
         })
       }
     }
-    if (dimensionFilters.value.populationMax !== null && dimensionFilters.value.populationMax !== '') {
+    if (dimensionFilters.populationMax !== null && dimensionFilters.populationMax !== '') {
       const popCol = filtered[0]?.total_population_2024 || 
                      filtered[0]?.total_population_2023 ||
                      filtered[0]?.total_population_2022 ||
@@ -154,32 +162,32 @@ export const useCensusStore = defineStore('census', () => {
       if (popCol) {
         filtered = filtered.filter(d => {
           const pop = parseFloat(d[popCol]) || 0
-          return pop <= parseFloat(dimensionFilters.value.populationMax)
+          return pop <= parseFloat(dimensionFilters.populationMax)
         })
       }
     }
-    if (dimensionFilters.value.areaMin !== null && dimensionFilters.value.areaMin !== '') {
+    if (dimensionFilters.areaMin !== null && dimensionFilters.areaMin !== '') {
       filtered = filtered.filter(d => {
         const area = parseFloat(d.land_area_sq_km) || 0
-        return area >= parseFloat(dimensionFilters.value.areaMin)
+        return area >= parseFloat(dimensionFilters.areaMin)
       })
     }
-    if (dimensionFilters.value.areaMax !== null && dimensionFilters.value.areaMax !== '') {
+    if (dimensionFilters.areaMax !== null && dimensionFilters.areaMax !== '') {
       filtered = filtered.filter(d => {
         const area = parseFloat(d.land_area_sq_km) || 0
-        return area <= parseFloat(dimensionFilters.value.areaMax)
+        return area <= parseFloat(dimensionFilters.areaMax)
       })
     }
-    if (currentMetric.value && dimensionFilters.value.metricValueMin !== null && dimensionFilters.value.metricValueMin !== '') {
+    if (currentMetric.value && dimensionFilters.metricValueMin !== null && dimensionFilters.metricValueMin !== '') {
       filtered = filtered.filter(d => {
         const val = parseFloat(d[currentMetric.value]) || 0
-        return val >= parseFloat(dimensionFilters.value.metricValueMin)
+        return val >= parseFloat(dimensionFilters.metricValueMin)
       })
     }
-    if (currentMetric.value && dimensionFilters.value.metricValueMax !== null && dimensionFilters.value.metricValueMax !== '') {
+    if (currentMetric.value && dimensionFilters.metricValueMax !== null && dimensionFilters.metricValueMax !== '') {
       filtered = filtered.filter(d => {
         const val = parseFloat(d[currentMetric.value]) || 0
-        return val <= parseFloat(dimensionFilters.value.metricValueMax)
+        return val <= parseFloat(dimensionFilters.metricValueMax)
       })
     }
 
@@ -340,30 +348,48 @@ export const useCensusStore = defineStore('census', () => {
   }
 
   const drillToState = (stateName) => {
-    currentState.value = stateName
-    currentCounty.value = null
-    currentLevel.value = 'county'
-    sortColumn.value = null
-    sortDirection.value = 'asc'
+    isLevelTransitioning.value = true
+    setTimeout(() => {
+      currentState.value = stateName
+      currentCounty.value = null
+      currentLevel.value = 'county'
+      sortColumn.value = null
+      sortDirection.value = 'asc'
+      setTimeout(() => {
+        isLevelTransitioning.value = false
+      }, 300)
+    }, 200)
   }
 
   const drillToCounty = (countyName) => {
-    currentCounty.value = countyName
-    currentLevel.value = 'zcta5'
-    sortColumn.value = null
-    sortDirection.value = 'asc'
+    isLevelTransitioning.value = true
+    setTimeout(() => {
+      currentCounty.value = countyName
+      currentLevel.value = 'zcta5'
+      sortColumn.value = null
+      sortDirection.value = 'asc'
+      setTimeout(() => {
+        isLevelTransitioning.value = false
+      }, 300)
+    }, 200)
   }
 
   const goBack = () => {
-    if (currentLevel.value === 'zcta5') {
-      currentCounty.value = null
-      currentLevel.value = 'county'
-    } else if (currentLevel.value === 'county') {
-      currentState.value = null
-      currentLevel.value = 'state'
-    }
-    sortColumn.value = null
-    sortDirection.value = 'asc'
+    isLevelTransitioning.value = true
+    setTimeout(() => {
+      if (currentLevel.value === 'zcta5') {
+        currentCounty.value = null
+        currentLevel.value = 'county'
+      } else if (currentLevel.value === 'county') {
+        currentState.value = null
+        currentLevel.value = 'state'
+      }
+      sortColumn.value = null
+      sortDirection.value = 'asc'
+      setTimeout(() => {
+        isLevelTransitioning.value = false
+      }, 300)
+    }, 200)
   }
 
   const reset = () => {
@@ -412,22 +438,63 @@ export const useCensusStore = defineStore('census', () => {
   }
   
   const resetFilters = () => {
-    dimensionFilters.value = {
-      selectedStates: [],
-      selectedRegions: [],
-      selectedDivisions: [],
-      selectedCongressionalDistricts: [],
-      selectedAiannh: [],
-      selectedUrbanRural: [],
-      selectedMetroAreas: [],
-      populationMin: null,
-      populationMax: null,
-      areaMin: null,
-      areaMax: null,
-      metricValueMin: null,
-      metricValueMax: null
+    if (currentLevel.value === 'state' && data.value.state) {
+      const allStates = [...new Set(data.value.state.map(d => d.state_name).filter(Boolean))]
+      dimensionFilters.selectedStates = allStates.length > 0 ? [...allStates] : []
+      dimensionFilters.selectedRegions = []
+      dimensionFilters.selectedDivisions = []
+    } else if (currentLevel.value === 'county' && data.value.county) {
+      const countyData = data.value.county.filter(d => d.state_name === currentState.value)
+      const allCDs = [...new Set(countyData.map(d => d.congressional_district || d.cd116 || '').filter(Boolean))]
+      const allAiannh = [...new Set(countyData.map(d => d.aiannh_name || 'N/A').filter(a => a && a !== 'N/A'))]
+      const allUR = [...new Set(countyData.map(d => d.urban_rural || 'N/A').filter(ur => ur && ur !== 'N/A'))]
+      const allMetros = [...new Set(countyData.map(d => d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)).filter(Boolean))]
+      
+      dimensionFilters.selectedCongressionalDistricts = allCDs.length > 0 ? [...allCDs] : []
+      dimensionFilters.selectedAiannh = allAiannh.length > 0 ? [...allAiannh] : []
+      dimensionFilters.selectedUrbanRural = allUR.length > 0 ? [...allUR] : []
+      dimensionFilters.selectedMetroAreas = allMetros.length > 0 ? [...allMetros] : []
+    } else if (currentLevel.value === 'zcta5' && data.value.zcta5) {
+      const zcta5Data = data.value.zcta5.filter(d => 
+        d.state_name === currentState.value && d.county_name === currentCounty.value
+      )
+      const allAiannh = [...new Set(zcta5Data.map(d => d.aiannh_name || 'N/A').filter(a => a && a !== 'N/A'))]
+      const allUR = [...new Set(zcta5Data.map(d => d.urban_rural || 'N/A').filter(ur => ur && ur !== 'N/A'))]
+      const allMetros = [...new Set(zcta5Data.map(d => d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)).filter(Boolean))]
+      
+      dimensionFilters.selectedAiannh = allAiannh.length > 0 ? [...allAiannh] : []
+      dimensionFilters.selectedUrbanRural = allUR.length > 0 ? [...allUR] : []
+      dimensionFilters.selectedMetroAreas = allMetros.length > 0 ? [...allMetros] : []
     }
+    
+    dimensionFilters.populationMin = null
+    dimensionFilters.populationMax = null
+    dimensionFilters.areaMin = null
+    dimensionFilters.areaMax = null
+    dimensionFilters.metricValueMin = null
+    dimensionFilters.metricValueMax = null
   }
+
+  watch(() => [
+    dimensionFilters.selectedStates,
+    dimensionFilters.selectedRegions,
+    dimensionFilters.selectedDivisions,
+    dimensionFilters.selectedCongressionalDistricts,
+    dimensionFilters.selectedAiannh,
+    dimensionFilters.selectedUrbanRural,
+    dimensionFilters.selectedMetroAreas,
+    dimensionFilters.populationMin,
+    dimensionFilters.populationMax,
+    dimensionFilters.areaMin,
+    dimensionFilters.areaMax,
+    dimensionFilters.metricValueMin,
+    dimensionFilters.metricValueMax
+  ], () => {
+    isFiltering.value = true
+    setTimeout(() => {
+      isFiltering.value = false
+    }, 300)
+  }, { deep: true })
 
   return {
     currentLevel,
@@ -442,6 +509,8 @@ export const useCensusStore = defineStore('census', () => {
     sortColumn,
     sortDirection,
     isLoading,
+    isLevelTransitioning,
+    isFiltering,
     manifest,
     searchQuery,
     dimensionFilters,

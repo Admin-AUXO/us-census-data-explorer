@@ -41,7 +41,10 @@
               <div class="metric-row">
                 <span class="metric-label">With Data</span>
                 <span class="metric-value">{{ validDataCount.toLocaleString() }}</span>
-                <span class="metric-sublabel">({{ coveragePercent }}% coverage)</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">Coverage</span>
+                <span class="metric-value">{{ coveragePercent }}%</span>
               </div>
               <div v-if="geoInfo.totalPopulation" class="metric-row">
                 <span class="metric-label">Total Population</span>
@@ -50,10 +53,6 @@
               <div v-if="geoInfo.totalArea" class="metric-row">
                 <span class="metric-label">Total Area</span>
                 <span class="metric-value">{{ geoInfo.totalArea }} km²</span>
-              </div>
-              <div v-if="geoInfo.urbanCount !== null" class="metric-row">
-                <span class="metric-label">Urban / Rural</span>
-                <span class="metric-value">{{ geoInfo.urbanCount }} / {{ geoInfo.ruralCount }}</span>
               </div>
             </div>
           </div>
@@ -74,11 +73,12 @@
                 <span class="metric-value">{{ formatValue(stats.median) }}</span>
               </div>
               <div class="metric-row">
-                <span class="metric-label">Min / Max</span>
-                <span class="metric-value">
-                  <span class="text-blue">{{ formatValue(stats.min) }}</span> / 
-                  <span class="text-green">{{ formatValue(stats.max) }}</span>
-                </span>
+                <span class="metric-label">Min</span>
+                <span class="metric-value text-blue">{{ formatValue(stats.min) }}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">Max</span>
+                <span class="metric-value text-green">{{ formatValue(stats.max) }}</span>
               </div>
               <div class="metric-row">
                 <span class="metric-label">Range</span>
@@ -87,10 +87,6 @@
               <div class="metric-row">
                 <span class="metric-label">Std. Deviation</span>
                 <span class="metric-value">{{ formatValue(stats.stdDev) }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">Coeff. of Variation</span>
-                <span class="metric-value">{{ (stats.coefficientOfVariation * 100).toFixed(1) }}%</span>
               </div>
             </div>
           </div>
@@ -108,11 +104,19 @@
                   {{ trendInfo.yoyChange > 0 ? '+' : '' }}{{ trendInfo.yoyChange.toFixed(1) }}%
                 </span>
               </div>
+              <div v-else class="metric-row">
+                <span class="metric-label">Year-over-Year</span>
+                <span class="metric-value">N/A</span>
+              </div>
               <div v-if="trendInfo.avgAnnualGrowth !== null && trendInfo.showAvgGrowth" class="metric-row">
                 <span class="metric-label">{{ trendInfo.avgGrowthLabel }}</span>
                 <span class="metric-value" :class="trendInfo.avgGrowthClass">
                   {{ trendInfo.avgAnnualGrowth > 0 ? '+' : '' }}{{ trendInfo.avgAnnualGrowth.toFixed(1) }}%
                 </span>
+              </div>
+              <div v-else class="metric-row">
+                <span class="metric-label">Avg. Annual Growth</span>
+                <span class="metric-value">N/A</span>
               </div>
               <div v-if="trendInfo.trendDirection" class="metric-row">
                 <span class="metric-label">Trend Direction</span>
@@ -120,9 +124,17 @@
                   {{ trendInfo.trendDirection }}
                 </span>
               </div>
+              <div v-else class="metric-row">
+                <span class="metric-label">Trend Direction</span>
+                <span class="metric-value">N/A</span>
+              </div>
               <div v-if="trendInfo.volatility !== null" class="metric-row">
                 <span class="metric-label">Volatility</span>
                 <span class="metric-value">{{ trendInfo.volatility.toFixed(2) }}</span>
+              </div>
+              <div v-else class="metric-row">
+                <span class="metric-label">Volatility</span>
+                <span class="metric-value">N/A</span>
               </div>
             </div>
           </div>
@@ -143,8 +155,20 @@
                 <span class="metric-value">{{ formatValue(stats.iqr) }}</span>
               </div>
               <div class="metric-row">
+                <span class="metric-label">Coeff. of Variation</span>
+                <span class="metric-value">{{ (stats.coefficientOfVariation * 100).toFixed(1) }}%</span>
+              </div>
+              <div class="metric-row">
                 <span class="metric-label">Skewness</span>
                 <span class="metric-value" :class="skewnessClass">{{ stats.skewness.toFixed(2) }}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">Q1 (25th)</span>
+                <span class="metric-value">{{ formatValue(stats.q1) }}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">Q3 (75th)</span>
+                <span class="metric-value">{{ formatValue(stats.q3) }}</span>
               </div>
             </div>
           </div>
@@ -628,12 +652,17 @@ const trendInfo = computed(() => {
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  gap: var(--spacing-xl);
 }
 
 @media (min-width: 1200px) {
   .summary-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .summary-card:not(.card-full) {
+    min-width: 0;
+    width: 100%;
   }
   
   .card-full {

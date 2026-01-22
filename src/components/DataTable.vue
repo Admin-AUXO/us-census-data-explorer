@@ -21,7 +21,13 @@
       </div>
     </div>
 
-    <div class="table-container">
+    <div class="table-container" :class="{ 'filtering': store.isFiltering }">
+      <Transition name="fade">
+        <div v-if="store.isFiltering" class="filtering-overlay">
+          <div class="filtering-spinner"></div>
+          <span class="filtering-text">Filtering data...</span>
+        </div>
+      </Transition>
       <table class="data-table">
         <thead>
           <tr>
@@ -325,3 +331,64 @@ const exportCSV = () => {
   document.body.removeChild(link)
 }
 </script>
+
+<style scoped>
+.table-container {
+  position: relative;
+  overflow: auto;
+}
+
+.table-container.filtering {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.filtering-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-bg-light);
+  backdrop-filter: blur(var(--blur-sm));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  z-index: var(--z-index-overlay);
+  border-radius: var(--radius-md);
+}
+
+.filtering-spinner {
+  width: var(--size-icon-4xl);
+  height: var(--size-icon-4xl);
+  border: var(--border-width-md) solid var(--border-color);
+  border-top-color: var(--accent-green);
+  border-radius: var(--radius-full);
+  animation: spin var(--duration-slowest) linear infinite;
+}
+
+.filtering-text {
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-body);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity var(--duration-normal) var(--easing-standard);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

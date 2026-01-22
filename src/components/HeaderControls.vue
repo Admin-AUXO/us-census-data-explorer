@@ -7,7 +7,7 @@
             <AuxoLogo size="normal" />
             <span class="separator-pipe">|</span>
             <div class="title-text">
-              <p class="subtitle">Census Data Explorer</p>
+              <p class="subtitle">USA Census Data Explorer</p>
             </div>
           </div>
           <div class="breadcrumb-section">
@@ -63,6 +63,17 @@
             </div>
           </div>
           <div class="header-actions">
+            <button 
+              class="btn-filters" 
+              @click="$emit('toggle-filters')" 
+              :class="{ 'has-active-filters': hasActiveFilters }"
+              title="Toggle advanced filters" 
+              aria-label="Toggle advanced filters"
+            >
+              <Filter :size="20" />
+              <span>Filters</span>
+              <span v-if="hasActiveFilters" class="filter-badge">{{ activeFilterCount }}</span>
+            </button>
             <button class="btn-help" @click="$emit('show-help')" title="Show help" aria-label="Show help">
               <HelpCircle :size="20" />
               <span>Help</span>
@@ -176,7 +187,6 @@
           </div>
         </div>
       </div>
-      <DimensionFilters />
       <div v-if="store.isLoading" class="loading-bar">
         <div class="loading-progress"></div>
       </div>
@@ -185,11 +195,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useCensusStore } from '../stores/census'
-import { Database, Calendar, TrendingUp, GitCompare, Search, X, HelpCircle, ChevronLeft, ChevronRight, Globe, MapPin, Building, Map, Layers } from 'lucide-vue-next'
+import { Database, Calendar, TrendingUp, GitCompare, Search, X, HelpCircle, ChevronLeft, ChevronRight, Globe, MapPin, Building, Map, Layers, Filter } from 'lucide-vue-next'
 import AuxoLogo from './AuxoLogo.vue'
-import DimensionFilters from './DimensionFilters.vue'
 
 const store = useCensusStore()
 const selectedDataset = ref('')
@@ -241,6 +250,14 @@ const compareYears = computed(() => {
   return availableYears.value.filter(year => year !== currentYear)
 })
 
+watch(() => store.manifest, (manifest) => {
+  if (manifest?.datasets && manifest.datasets.length > 0 && !selectedDataset.value && !store.currentDataset) {
+    const firstDataset = manifest.datasets[0].source_file
+    selectedDataset.value = firstDataset
+    onDatasetChange()
+  }
+}, { immediate: true })
+
 watch(() => selectedMetric.value, () => {
   if (selectedMetric.value && !store.compareYear) {
     store.setAutoCompareYear()
@@ -257,6 +274,12 @@ const onDatasetChange = async () => {
   if (!selectedDataset.value) {
     store.currentDataset = null
     store.data.state = null
+    store.data.county = null
+    store.data.zcta5 = null
+    selectedYear.value = ''
+    selectedMetric.value = ''
+    store.currentYear = null
+    store.currentMetric = null
     return
   }
 
@@ -321,18 +344,65 @@ const levelName = computed(() => {
   return names[store.currentLevel] || 'Unknown'
 })
 
+const hasActiveFilters = computed(() => {
+  const filters = store.dimensionFilters
+  return filters.selectedStates.length > 0 ||
+         filters.selectedRegions.length > 0 ||
+         filters.selectedDivisions.length > 0 ||
+         filters.selectedCongressionalDistricts.length > 0 ||
+         filters.selectedAiannh.length > 0 ||
+         filters.selectedUrbanRural.length > 0 ||
+         filters.selectedMetroAreas.length > 0 ||
+         filters.populationMin !== null ||
+         filters.populationMax !== null ||
+         filters.areaMin !== null ||
+         filters.areaMax !== null ||
+         filters.metricValueMin !== null ||
+         filters.metricValueMax !== null
+})
+
+const activeFilterCount = computed(() => {
+  const filters = store.dimensionFilters
+  let count = filters.selectedStates.length +
+              filters.selectedRegions.length +
+              filters.selectedDivisions.length +
+              filters.selectedCongressionalDistricts.length +
+              filters.selectedAiannh.length +
+              filters.selectedUrbanRural.length +
+              filters.selectedMetroAreas.length
+  if (filters.populationMin !== null || filters.populationMax !== null) count++
+  if (filters.areaMin !== null || filters.areaMax !== null) count++
+  if (filters.metricValueMin !== null || filters.metricValueMax !== null) count++
+  return count
+})
+
 const navigateToState = () => {
   if (store.currentLevel === 'zcta5') {
     store.goBack()
   }
 }
 
-const prefs = store.loadPreferences()
-if (prefs) {
-  selectedDataset.value = prefs.dataset || ''
-  selectedYear.value = prefs.year || ''
-  selectedMetric.value = prefs.metric || ''
-}
+watch(() => store.manifest, (manifest) => {
+  if (manifest?.datasets && manifest.datasets.length > 0) {
+    const prefs = store.loadPreferences()
+    if (prefs && prefs.dataset) {
+      const exists = manifest.datasets.some(d => d.source_file === prefs.dataset)
+      if (exists && !store.currentDataset) {
+        selectedDataset.value = prefs.dataset
+        if (prefs.year) selectedYear.value = prefs.year
+        if (prefs.metric) selectedMetric.value = prefs.metric
+        onDatasetChange()
+        return
+      }
+    }
+    
+    if (!selectedDataset.value && !store.currentDataset) {
+      const firstDataset = manifest.datasets[0].source_file
+      selectedDataset.value = firstDataset
+      onDatasetChange()
+    }
+  }
+}, { immediate: true })
 </script>
 
 <style scoped>
@@ -343,7 +413,7 @@ if (prefs) {
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
-  z-index: 200;
+  z-index: var(--z-index-sticky);
 }
 
 .container {
@@ -371,14 +441,16 @@ if (prefs) {
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0;
 }
 
 .separator-pipe {
   color: var(--text-tertiary);
   font-size: 0.875rem;
   font-weight: 300;
-  margin: 0 0.125rem;
+  margin: 0;
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
 }
 
 .title-text {
@@ -431,7 +503,7 @@ if (prefs) {
 }
 
 .back-button:hover {
-  background: rgba(var(--accent-green-rgb), 0.85);
+  background: var(--accent-green-opacity-85);
   transform: translateX(-2px);
   box-shadow: var(--shadow-md);
 }
@@ -571,6 +643,51 @@ if (prefs) {
   gap: 0.75rem;
 }
 
+.btn-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+  font-size: 0.8125rem;
+  position: relative;
+}
+
+.btn-filters:hover {
+  background: var(--bg-surface);
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-filters.has-active-filters {
+  border-color: var(--accent-green);
+  background: var(--accent-green-opacity-10);
+  color: var(--accent-green);
+}
+
+.btn-filters .filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  background: var(--accent-green);
+  color: var(--bg-card);
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  margin-left: 0.25rem;
+}
+
 .btn-help {
   display: flex;
   align-items: center;
@@ -648,7 +765,7 @@ if (prefs) {
 .control-group input[type="text"]:focus {
   outline: none;
   border-color: var(--accent-green);
-  box-shadow: 0 0 0 2px var(--accent-green-opacity-15);
+  box-shadow: var(--shadow-focus-sm);
   background-color: var(--bg-surface);
 }
 

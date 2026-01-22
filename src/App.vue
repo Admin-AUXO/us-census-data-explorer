@@ -52,14 +52,13 @@
           <div class="footer-brand">
             <AuxoLogo size="small" />
             <div class="brand-info">
-              <p class="brand-tagline">Look Beyond Data</p>
               <p class="brand-site">auxodata.com</p>
             </div>
           </div>
           <div class="footer-sections">
             <div class="footer-section">
               <h4>About</h4>
-              <p>Interactive visualization of US Census ACS data at multiple geographic levels with comprehensive statistical analysis.</p>
+              <p>Explore comprehensive US Census data through interactive visualizations across states, counties, and ZIP codes. Analyze demographic, economic, and housing trends with advanced filtering and statistical insights.</p>
             </div>
             <div class="footer-section">
               <h4>Data Source</h4>
@@ -85,7 +84,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2024 AUXO Data Labs. All rights reserved.</p>
+          <p>&copy; 2026 AUXO Data Labs</p>
         </div>
       </div>
     </footer>
@@ -348,7 +347,7 @@ onUnmounted(() => {
 .footer {
   background: var(--bg-card);
   color: var(--text-primary);
-  padding: 3rem 0 1.5rem;
+  padding: 2.5rem 0 1.25rem;
   margin-top: auto;
   border-top: 1px solid var(--border-color);
 }
@@ -362,17 +361,18 @@ onUnmounted(() => {
 
 .footer-main {
   display: grid;
-  grid-template-columns: 1.5fr 2fr;
-  gap: 3rem;
+  grid-template-columns: 1.2fr 2.8fr;
+  gap: 4rem;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
   border-bottom: 1px solid var(--border-color);
+  align-items: start;
 }
 
 .footer-brand {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .footer-brand > :deep(.auxo-logo-container) {
@@ -383,27 +383,21 @@ onUnmounted(() => {
 .brand-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-}
-
-.brand-tagline {
-  font-size: 0.875rem;
-  font-weight: 600;
-  font-style: italic;
-  color: var(--accent-green);
-  margin: 0;
+  gap: 0;
 }
 
 .brand-site {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: var(--text-secondary);
   margin: 0;
+  font-weight: 500;
 }
 
 .footer-sections {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
 }
 
 .footer-section h4 {
@@ -417,9 +411,10 @@ onUnmounted(() => {
 
 .footer-section p {
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.7;
   font-size: 0.875rem;
   margin: 0;
+  max-width: 100%;
 }
 
 .footer-links {

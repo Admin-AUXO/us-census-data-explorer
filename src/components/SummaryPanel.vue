@@ -164,13 +164,11 @@
                 <div class="performer-list">
                   <div v-for="(item, idx) in topPerformers" :key="idx" class="performer-item top">
                     <span class="rank">#{{ idx + 1 }}</span>
-                    <div class="performer-info">
-                      <span class="name">{{ item.name }}</span>
-                      <span class="value">{{ formatValue(item.value) }}</span>
-                      <span v-if="item.changePercent !== null" :class="['performer-change', item.changeClass]">
-                        {{ item.changePercent > 0 ? '+' : '' }}{{ item.changePercent.toFixed(1) }}%
-                      </span>
-                    </div>
+                    <span class="name">{{ item.name }}</span>
+                    <span class="value">{{ formatValue(item.value) }}</span>
+                    <span v-if="item.changePercent !== null" :class="['performer-change', item.changeClass]">
+                      {{ item.changePercent > 0 ? '+' : '' }}{{ item.changePercent.toFixed(1) }}%
+                    </span>
                   </div>
                 </div>
               </div>
@@ -182,13 +180,11 @@
                 <div class="performer-list">
                   <div v-for="(item, idx) in bottomPerformers" :key="idx" class="performer-item bottom">
                     <span class="rank">#{{ idx + 1 }}</span>
-                    <div class="performer-info">
-                      <span class="name">{{ item.name }}</span>
-                      <span class="value">{{ formatValue(item.value) }}</span>
-                      <span v-if="item.changePercent !== null" :class="['performer-change', item.changeClass]">
-                        {{ item.changePercent > 0 ? '+' : '' }}{{ item.changePercent.toFixed(1) }}%
-                      </span>
-                    </div>
+                    <span class="name">{{ item.name }}</span>
+                    <span class="value">{{ formatValue(item.value) }}</span>
+                    <span v-if="item.changePercent !== null" :class="['performer-change', item.changeClass]">
+                      {{ item.changePercent > 0 ? '+' : '' }}{{ item.changePercent.toFixed(1) }}%
+                    </span>
                   </div>
                 </div>
               </div>
@@ -604,7 +600,7 @@ const trendInfo = computed(() => {
 
 @media (min-width: 1200px) {
   .summary-grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
   
   .card-full {
@@ -790,10 +786,11 @@ const trendInfo = computed(() => {
 }
 
 .performer-item {
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
-  padding: 0.875rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 0.875rem;
+  align-items: center;
+  padding: 0.875rem 1rem;
   border-radius: var(--radius-md);
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
@@ -819,15 +816,6 @@ const trendInfo = computed(() => {
   color: var(--text-secondary);
   font-size: 0.85rem;
   flex-shrink: 0;
-  margin-top: 0.125rem;
-}
-
-.performer-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-  flex: 1;
-  min-width: 0;
 }
 
 .performer-item .name {
@@ -837,21 +825,24 @@ const trendInfo = computed(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.9rem;
+  min-width: 0;
 }
 
 .performer-item .value {
   font-weight: 700;
   color: var(--accent-green);
-  font-size: 1rem;
+  font-size: 0.95rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .performer-change {
   font-size: 0.75rem;
   font-weight: 600;
-  padding: 0.125rem 0.5rem;
+  padding: 0.25rem 0.5rem;
   border-radius: var(--radius-sm);
-  display: inline-block;
-  width: fit-content;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .performer-change.change-positive {

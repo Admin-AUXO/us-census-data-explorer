@@ -444,28 +444,42 @@ const exportCSV = () => {
   background: var(--overlay-bg-light);
   backdrop-filter: blur(var(--blur-sm));
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
   z-index: var(--z-index-overlay);
   border-radius: var(--radius-md);
 }
 
+.filtering-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.75rem 2.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  min-width: 200px;
+  animation: scaleIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .filtering-spinner {
-  width: var(--size-icon-4xl);
-  height: var(--size-icon-4xl);
-  border: var(--border-width-md) solid var(--border-color);
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
   border-top-color: var(--accent-green);
   border-radius: var(--radius-full);
-  animation: spin var(--duration-slowest) linear infinite;
+  animation: spin 0.7s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 
 .filtering-text {
   color: var(--text-primary);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
+  font-size: 0.875rem;
+  font-weight: 600;
   font-family: var(--font-body);
+  text-align: center;
+  white-space: nowrap;
 }
 
 @keyframes spin {
@@ -474,9 +488,12 @@ const exportCSV = () => {
   }
 }
 
-.fade-enter-active,
+.fade-enter-active {
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .fade-leave-active {
-  transition: opacity var(--duration-normal) var(--easing-standard);
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fade-enter-from,

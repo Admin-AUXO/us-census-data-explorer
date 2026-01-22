@@ -8,7 +8,7 @@
       <div v-if="store.isLevelTransitioning" class="level-transition-overlay">
         <div class="transition-loader">
           <div class="loader-spinner"></div>
-          <p class="loader-text">Loading {{ nextLevelName }}...</p>
+          <p class="loader-text">{{ transitionMessage }}</p>
         </div>
       </div>
     </Transition>
@@ -203,28 +203,30 @@ onUnmounted(() => {
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.95) translateY(-8px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
 .loader-spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid var(--border-color);
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
   border-top-color: var(--accent-green);
   border-radius: 50%;
-  animation: spin 0.6s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  animation: spin 0.7s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 
 .loader-text {
   color: var(--text-primary);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 600;
   margin: 0;
+  text-align: center;
+  white-space: nowrap;
 }
 
 @keyframes spin {
@@ -234,7 +236,7 @@ onUnmounted(() => {
 }
 
 .fade-enter-active {
-  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fade-leave-active {

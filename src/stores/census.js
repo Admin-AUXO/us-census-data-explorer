@@ -28,6 +28,7 @@ export const useCensusStore = defineStore('census', () => {
   const isLoading = ref(false)
   const isLevelTransitioning = ref(false)
   const isFiltering = ref(false)
+  const navigationDirection = ref('forward')
   const manifest = ref(null)
   const searchQuery = ref('')
   
@@ -399,6 +400,7 @@ export const useCensusStore = defineStore('census', () => {
   }
 
   const drillToState = async (stateName) => {
+    navigationDirection.value = 'forward'
     isLevelTransitioning.value = true
     setTimeout(async () => {
       currentState.value = stateName
@@ -422,6 +424,7 @@ export const useCensusStore = defineStore('census', () => {
   }
 
   const drillToCounty = async (countyName) => {
+    navigationDirection.value = 'forward'
     isLevelTransitioning.value = true
     setTimeout(async () => {
       currentCounty.value = countyName
@@ -444,6 +447,7 @@ export const useCensusStore = defineStore('census', () => {
   }
 
   const goBack = () => {
+    navigationDirection.value = 'backward'
     isLevelTransitioning.value = true
     setTimeout(() => {
       if (currentLevel.value === 'zcta5') {
@@ -637,6 +641,7 @@ export const useCensusStore = defineStore('census', () => {
     isLoading,
     isLevelTransitioning,
     isFiltering,
+    navigationDirection,
     levelLoadingState,
     manifest,
     searchQuery,

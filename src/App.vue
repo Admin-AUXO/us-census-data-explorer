@@ -431,24 +431,43 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  transition: all var(--duration-fast) var(--easing-standard);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 0.875rem;
-  padding: 0.375rem 0;
+  padding: 0.375rem 0.5rem;
+  margin: 0 -0.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
 }
 
 .footer-links a:hover {
   color: var(--accent-green);
   transform: translateX(4px);
+  background: var(--accent-green-opacity-10);
+}
+
+.footer-links a:focus {
+  outline: 2px solid var(--accent-green);
+  outline-offset: 2px;
+  color: var(--accent-green);
+  background: var(--accent-green-opacity-05);
+}
+
+.footer-links a:active {
+  transform: translateX(2px);
+  background: var(--accent-green-opacity-15);
 }
 
 .footer-links a svg {
   flex-shrink: 0;
   color: var(--accent-green);
   opacity: 0.8;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.footer-links a:hover svg {
+.footer-links a:hover svg,
+.footer-links a:focus svg {
   opacity: 1;
+  transform: scale(1.05);
 }
 
 .footer-bottom {

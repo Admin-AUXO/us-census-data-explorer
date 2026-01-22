@@ -47,36 +47,45 @@
     </main>
 
     <footer class="footer">
-      <div class="container">
-        <div class="footer-content">
-          <div class="footer-section">
-            <h4>About This Project</h4>
-            <p>Interactive visualization of US Census ACS data at multiple geographic levels with comprehensive statistical analysis and insights.</p>
+      <div class="footer-container">
+        <div class="footer-main">
+          <div class="footer-brand">
+            <AuxoLogo size="small" />
+            <div class="brand-info">
+              <p class="brand-tagline">Look Beyond Data</p>
+              <p class="brand-site">auxodata.com</p>
+            </div>
           </div>
-          <div class="footer-section">
-            <h4>Data Source</h4>
-            <p>US Census Bureau - American Community Survey (ACS) 5-Year Estimates (2022)</p>
-          </div>
-          <div class="footer-section">
-            <h4>Quick Links</h4>
-            <div class="footer-links">
-              <a href="#" @click.prevent="showHelp = true">
-                <Info :size="16" />
-                Help Guide
-              </a>
-              <a href="https://www.census.gov/data/developers/data-sets/acs-5year.html" target="_blank">
-                <ExternalLink :size="16" />
-                API Documentation
-              </a>
-              <a href="https://data.census.gov" target="_blank">
-                <ExternalLink :size="16" />
-                Census Data Portal
-              </a>
+          <div class="footer-sections">
+            <div class="footer-section">
+              <h4>About</h4>
+              <p>Interactive visualization of US Census ACS data at multiple geographic levels with comprehensive statistical analysis.</p>
+            </div>
+            <div class="footer-section">
+              <h4>Data Source</h4>
+              <p>US Census Bureau - American Community Survey (ACS) 5-Year Estimates</p>
+            </div>
+            <div class="footer-section">
+              <h4>Resources</h4>
+              <div class="footer-links">
+                <a href="#" @click.prevent="showHelp = true">
+                  <Info :size="16" />
+                  <span>Help Guide</span>
+                </a>
+                <a href="https://www.census.gov/data/developers/data-sets/acs-5year.html" target="_blank" rel="noopener noreferrer">
+                  <ExternalLink :size="16" />
+                  <span>API Docs</span>
+                </a>
+                <a href="https://data.census.gov" target="_blank" rel="noopener noreferrer">
+                  <ExternalLink :size="16" />
+                  <span>Data Portal</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2024 US Census Data Explorer | Built with Vue 3 & Modern Web Technologies</p>
+          <p>&copy; 2024 AUXO Data Labs. All rights reserved.</p>
         </div>
       </div>
     </footer>
@@ -92,6 +101,7 @@ import SummaryPanel from './components/SummaryPanel.vue'
 import HelpPanel from './components/HelpPanel.vue'
 import DimensionFilters from './components/DimensionFilters.vue'
 import { Database, MapPin, TrendingUp, BarChart, Info, ExternalLink } from 'lucide-vue-next'
+import AuxoLogo from './components/AuxoLogo.vue'
 
 const store = useCensusStore()
 const showHelp = ref(false)
@@ -317,24 +327,70 @@ onUnmounted(() => {
 }
 
 .footer {
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   color: var(--text-primary);
-  padding: 2.5rem 0 1.25rem;
+  padding: 3rem 0 1.5rem;
   margin-top: auto;
   border-top: 1px solid var(--border-color);
 }
 
-.footer-content {
+.footer-container {
+  max-width: var(--size-container-max);
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+}
+
+.footer-main {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1.5fr;
+  grid-template-columns: 1.5fr 2fr;
   gap: 3rem;
   margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.footer-brand > :deep(.auxo-logo-container) {
+  margin: 0;
+  padding: 0;
+}
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.brand-tagline {
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--accent-green);
+  margin: 0;
+}
+
+.brand-site {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.footer-sections {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
 }
 
 .footer-section h4 {
   color: var(--accent-green);
-  font-size: 0.875rem;
-  margin-bottom: 0.875rem;
+  font-size: 0.8125rem;
+  margin: 0 0 0.875rem 0;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -350,7 +406,7 @@ onUnmounted(() => {
 .footer-links {
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 0.75rem;
 }
 
 .footer-links a {
@@ -358,20 +414,21 @@ onUnmounted(() => {
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
   transition: all var(--duration-fast) var(--easing-standard);
   font-size: 0.875rem;
-  padding: 0.25rem 0;
+  padding: 0.375rem 0;
 }
 
 .footer-links a:hover {
   color: var(--accent-green);
-  transform: translateX(2px);
+  transform: translateX(4px);
 }
 
 .footer-links a svg {
   flex-shrink: 0;
-  opacity: 0.7;
+  color: var(--accent-green);
+  opacity: 0.8;
 }
 
 .footer-links a:hover svg {
@@ -380,7 +437,6 @@ onUnmounted(() => {
 
 .footer-bottom {
   padding-top: 1.5rem;
-  border-top: 1px solid var(--border-color);
   text-align: center;
 }
 
@@ -403,23 +459,23 @@ onUnmounted(() => {
     padding: 1rem;
   }
 
-  .footer-content {
-    gap: 1.5rem;
+  .footer-container {
+    padding: 0 1rem;
   }
 
-  .empty-state-features {
-    flex-direction: column;
-    gap: 1rem;
+  .footer-main {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .footer-sections {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .footer {
     padding: 2rem 0 1rem;
-  }
-
-  .footer-content {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
   }
 
   .footer-bottom {

@@ -1,192 +1,202 @@
 <template>
   <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <div class="header-left">
-          <div class="logo-section">
-            <AuxoLogo size="normal" />
-            <span class="separator-pipe">|</span>
-            <p class="subtitle title-inline">USA Census Data Explorer</p>
-          </div>
-          <div class="breadcrumb-section">
-            <button
-              v-if="store.currentLevel !== 'state'"
-              class="back-button"
-              @click="store.goBack()"
-              aria-label="Go back to previous level"
-            >
-              <ChevronLeft :size="16" />
-              <span>Back</span>
-            </button>
-            <div class="breadcrumb-trail">
-              <button
-                class="breadcrumb-item root"
-                @click="store.reset()"
-                :class="{ active: store.currentLevel === 'state' }"
-              >
-                <Globe :size="14" />
-                <span>United States</span>
-              </button>
-              <ChevronRight v-if="store.currentState" :size="12" class="separator" />
-              <button
-                v-if="store.currentState"
-                class="breadcrumb-item"
-                @click="navigateToState"
-                :class="{ active: store.currentLevel === 'county' }"
-              >
-                <MapPin :size="14" />
-                <span>{{ store.currentState }}</span>
-              </button>
-              <ChevronRight v-if="store.currentCounty" :size="12" class="separator" />
-              <button
-                v-if="store.currentCounty"
-                class="breadcrumb-item"
-                :class="{ active: store.currentLevel === 'zcta5' }"
-                disabled
-              >
-                <Building :size="14" />
-                <span>{{ store.currentCounty }}</span>
-              </button>
-            </div>
-          </div>
+    <div class="header-container">
+      <div class="header-top">
+        <div class="header-brand">
+          <AuxoLogo size="normal" />
+          <div class="brand-separator"></div>
+          <h1 class="app-title">USA Census Data Explorer</h1>
         </div>
-        <div class="header-right">
-          <div class="level-indicator">
-            <div class="indicator-icon">
-              <component :is="levelIcon" :size="16" />
-            </div>
-            <div class="indicator-text">
-              <span class="level-label">Current View</span>
-              <span class="level-value">{{ levelName }}</span>
-            </div>
-          </div>
-          <div class="header-actions">
-            <button 
-              class="btn-filters" 
-              @click="$emit('toggle-filters')" 
-              :class="{ 'has-active-filters': hasActiveFilters }"
-              title="Toggle advanced filters" 
-              aria-label="Toggle advanced filters"
-            >
-              <Filter :size="20" />
-              <span>Filters</span>
-              <span v-if="hasActiveFilters" class="filter-badge">{{ activeFilterCount }}</span>
-            </button>
-            <button class="btn-help" @click="$emit('show-help')" title="Show help" aria-label="Show help">
-              <HelpCircle :size="20" />
-              <span>Help</span>
-            </button>
-          </div>
+        <div class="header-controls">
+          <button 
+            class="btn-view-level"
+            :title="`Current view: ${levelName}`"
+          >
+            <component :is="levelIcon" :size="18" />
+            <span class="view-label">{{ levelName }}</span>
+          </button>
+          <button 
+            class="btn-filters" 
+            @click="$emit('toggle-filters')" 
+            :class="{ 'active': hasActiveFilters }"
+            :title="hasActiveFilters ? `${activeFilterCount} active filters` : 'Toggle filters'"
+          >
+            <Filter :size="18" />
+            <span>Filters</span>
+            <span v-if="hasActiveFilters" class="badge">{{ activeFilterCount }}</span>
+          </button>
+          <button 
+            class="btn-help" 
+            @click="$emit('show-help')"
+            title="Show help"
+          >
+            <HelpCircle :size="18" />
+            <span>Help</span>
+          </button>
         </div>
       </div>
 
-      <div class="header-filters">
-        <div class="control-group">
-          <label for="dataset-select">
-            <Database :size="18" />
-            Dataset
-          </label>
-          <select
-            id="dataset-select"
-            v-model="selectedDataset"
-            @change="onDatasetChange"
-            aria-label="Select dataset"
+      <div class="header-nav">
+        <div class="nav-breadcrumbs">
+          <button
+            v-if="store.currentLevel !== 'state'"
+            class="btn-back"
+            @click="store.goBack()"
+            aria-label="Go back"
           >
-            <option value="">Choose a dataset...</option>
-            <option
-              v-for="dataset in store.manifest?.datasets"
-              :key="dataset.source_file"
-              :value="dataset.source_file"
+            <ChevronLeft :size="16" />
+            <span>Back</span>
+          </button>
+          <nav class="breadcrumb-nav">
+            <button
+              class="breadcrumb-link"
+              :class="{ 'active': store.currentLevel === 'state' }"
+              @click="store.reset()"
             >
-              {{ formatDatasetName(dataset.source_file) }}
-            </option>
-          </select>
+              <Globe :size="14" />
+              <span>United States</span>
+            </button>
+            <ChevronRight v-if="store.currentState" :size="12" class="breadcrumb-sep" />
+            <button
+              v-if="store.currentState"
+              class="breadcrumb-link"
+              :class="{ 'active': store.currentLevel === 'county' }"
+              @click="navigateToState"
+            >
+              <MapPin :size="14" />
+              <span>{{ store.currentState }}</span>
+            </button>
+            <ChevronRight v-if="store.currentCounty" :size="12" class="breadcrumb-sep" />
+            <button
+              v-if="store.currentCounty"
+              class="breadcrumb-link"
+              :class="{ 'active': store.currentLevel === 'zcta5' }"
+              disabled
+            >
+              <Building :size="14" />
+              <span>{{ store.currentCounty }}</span>
+            </button>
+          </nav>
         </div>
+      </div>
 
-        <div class="control-group">
-          <label for="year-select">
-            <Calendar :size="18" />
-            Year
-          </label>
-          <select
-            id="year-select"
-            v-model="selectedYear"
-            @change="onYearChange"
-            :disabled="!selectedDataset"
-            aria-label="Select year"
-          >
-            <option value="">Select year...</option>
-            <option v-for="year in availableYears" :key="year" :value="year">
-              {{ year }}
-            </option>
-          </select>
-        </div>
+      <div class="header-filters-bar">
+        <div class="filter-controls">
+          <div class="filter-item">
+            <label for="dataset-select">
+              <Database :size="16" />
+              <span>Dataset</span>
+            </label>
+            <select
+              id="dataset-select"
+              v-model="selectedDataset"
+              @change="onDatasetChange"
+            >
+              <option value="">Select dataset...</option>
+              <option
+                v-for="dataset in store.manifest?.datasets"
+                :key="dataset.source_file"
+                :value="dataset.source_file"
+              >
+                {{ formatDatasetName(dataset.source_file) }}
+              </option>
+            </select>
+          </div>
 
-        <div class="control-group">
-          <label for="metric-select">
-            <TrendingUp :size="18" />
-            Metric
-          </label>
-          <select
-            id="metric-select"
-            v-model="selectedMetric"
-            @change="onMetricChange"
-            :disabled="!selectedYear"
-            aria-label="Select metric"
-          >
-            <option value="">Select metric...</option>
-            <option v-for="metric in availableMetrics" :key="metric.value" :value="metric.value">
-              {{ metric.label }}
-            </option>
-          </select>
-        </div>
+          <div class="filter-item">
+            <label for="year-select">
+              <Calendar :size="16" />
+              <span>Year</span>
+            </label>
+            <select
+              id="year-select"
+              v-model="selectedYear"
+              @change="onYearChange"
+              :disabled="!selectedDataset"
+            >
+              <option value="">Select year...</option>
+              <option
+                v-for="year in availableYears"
+                :key="year"
+                :value="year"
+              >
+                {{ year }}
+              </option>
+            </select>
+          </div>
 
-        <div class="control-group">
-          <label for="compare-year">
-            <GitCompare :size="18" />
-            Compare
-          </label>
-          <select
-            id="compare-year"
-            :value="store.compareYear || ''"
-            @change="handleCompareYearChange"
-            :disabled="!selectedMetric"
-            aria-label="Compare with year"
-          >
-            <option value="">Auto (Previous Year)</option>
-            <option v-for="year in compareYears" :key="year" :value="year">
-              {{ year }}
-            </option>
-          </select>
-        </div>
+          <div class="filter-item">
+            <label for="metric-select">
+              <TrendingUp :size="16" />
+              <span>Metric</span>
+            </label>
+            <select
+              id="metric-select"
+              v-model="selectedMetric"
+              @change="onMetricChange"
+              :disabled="!selectedYear"
+            >
+              <option value="">Select metric...</option>
+              <option
+                v-for="metric in availableMetrics"
+                :key="metric.value"
+                :value="metric.value"
+              >
+                {{ metric.label }}
+              </option>
+            </select>
+          </div>
 
-        <div class="control-group search-wrapper">
-          <label for="search-input">
-            <Search :size="18" />
-            Search
-          </label>
-          <div class="search-input-wrapper">
-            <input
-              type="text"
-              id="search-input"
-              v-model="store.searchQuery"
-              placeholder="Type to filter locations..."
+          <div class="filter-item">
+            <label for="compare-select">
+              <GitCompare :size="16" />
+              <span>Compare</span>
+            </label>
+            <select
+              id="compare-select"
+              v-model="selectedCompareYear"
+              @change="handleCompareYearChange"
               :disabled="!selectedMetric"
-              aria-label="Search locations"
-            />
-            <button
-              v-if="store.searchQuery"
-              class="clear-search"
-              @click="store.searchQuery = ''"
-              aria-label="Clear search"
             >
-              <X :size="16" />
-            </button>
+              <option value="">None</option>
+              <option
+                v-for="year in compareYears"
+                :key="year"
+                :value="year"
+              >
+                {{ year }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-item filter-search">
+            <label for="search-input">
+              <Search :size="16" />
+              <span>Search</span>
+            </label>
+            <div class="search-wrapper">
+              <input
+                id="search-input"
+                type="text"
+                v-model="store.searchQuery"
+                placeholder="Filter locations..."
+                :disabled="!selectedMetric"
+              />
+              <button
+                v-if="store.searchQuery"
+                class="btn-clear-search"
+                @click="store.searchQuery = ''"
+                aria-label="Clear search"
+              >
+                <X :size="14" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
-      <div v-if="store.isLoading" class="loading-bar">
-        <div class="loading-progress"></div>
+
+      <div v-if="store.isLoading" class="loading-indicator">
+        <div class="loading-bar"></div>
       </div>
     </div>
   </header>
@@ -202,6 +212,7 @@ const store = useCensusStore()
 const selectedDataset = ref('')
 const selectedYear = ref('')
 const selectedMetric = ref('')
+const selectedCompareYear = ref('')
 
 const formatDatasetName = (filename) => {
   return filename
@@ -212,19 +223,16 @@ const formatDatasetName = (filename) => {
 
 const availableYears = computed(() => {
   if (!store.data.state || store.data.state.length === 0) return []
-
   const columns = Object.keys(store.data.state[0])
   const yearMatches = columns
     .map(col => col.match(/_(\d{4})$/))
     .filter(match => match)
     .map(match => match[1])
-
   return [...new Set(yearMatches)].sort().reverse()
 })
 
 const availableMetrics = computed(() => {
   if (!store.data.state || !selectedYear.value) return []
-
   const columns = Object.keys(store.data.state[0])
   const metrics = columns
     .filter(col => col.endsWith(`_${selectedYear.value}`))
@@ -235,94 +243,19 @@ const availableMetrics = computed(() => {
         label: base.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
       }
     })
-
   return metrics
 })
 
 const compareYears = computed(() => {
   if (!selectedMetric.value) return []
-
-  const baseMetric = selectedMetric.value.replace(/_(\d{4})$/, '')
-  const currentYear = selectedMetric.value.match(/_(\d{4})$/)?.[1]
-
-  return availableYears.value.filter(year => year !== currentYear)
+  const columns = Object.keys(store.data.state[0])
+  const yearMatches = columns
+    .map(col => col.match(/_(\d{4})$/))
+    .filter(match => match)
+    .map(match => match[1])
+  const years = [...new Set(yearMatches)].sort().reverse()
+  return years.filter(y => y !== selectedYear.value)
 })
-
-watch(() => store.manifest, (manifest) => {
-  if (manifest?.datasets && manifest.datasets.length > 0 && !selectedDataset.value && !store.currentDataset) {
-    const firstDataset = manifest.datasets[0].source_file
-    selectedDataset.value = firstDataset
-    onDatasetChange()
-  }
-}, { immediate: true })
-
-watch(() => selectedMetric.value, () => {
-  if (selectedMetric.value && !store.compareYear) {
-    store.setAutoCompareYear()
-  }
-})
-
-watch(() => store.compareYear, (newVal) => {
-  if (newVal === '' || newVal === null) {
-    store.setAutoCompareYear()
-  }
-})
-
-const onDatasetChange = async () => {
-  if (!selectedDataset.value) {
-    store.currentDataset = null
-    store.data.state = null
-    store.data.county = null
-    store.data.zcta5 = null
-    selectedYear.value = ''
-    selectedMetric.value = ''
-    store.currentYear = null
-    store.currentMetric = null
-    return
-  }
-
-  try {
-    await store.loadDataset(selectedDataset.value)
-    store.currentDataset = selectedDataset.value
-
-    if (availableYears.value.length > 0) {
-      selectedYear.value = availableYears.value[0]
-      onYearChange()
-    }
-  } catch (error) {
-    console.error('Failed to load dataset:', error)
-  }
-}
-
-const onYearChange = () => {
-  store.currentYear = selectedYear.value
-  selectedMetric.value = ''
-  store.currentMetric = null
-  store.setAutoCompareYear()
-
-  if (availableMetrics.value.length > 0) {
-    selectedMetric.value = availableMetrics.value[0].value
-    onMetricChange()
-  }
-}
-
-const onMetricChange = () => {
-  store.currentMetric = selectedMetric.value
-  if (!store.compareYear) {
-    store.setAutoCompareYear()
-  }
-  store.savePreferences()
-}
-
-const handleCompareYearChange = (event) => {
-  const value = event.target.value
-  if (value === '') {
-    store.compareYear = null
-    store.setAutoCompareYear()
-  } else {
-    store.compareYear = value
-  }
-}
 
 const levelIcon = computed(() => {
   const icons = {
@@ -345,34 +278,40 @@ const levelName = computed(() => {
 const hasActiveFilters = computed(() => {
   const filters = store.dimensionFilters
   if (!filters) return false
-  return filters.selectedStates.length > 0 ||
-         filters.selectedRegions.length > 0 ||
-         filters.selectedDivisions.length > 0 ||
-         filters.selectedCongressionalDistricts.length > 0 ||
-         filters.selectedAiannh.length > 0 ||
-         filters.selectedUrbanRural.length > 0 ||
-         filters.selectedMetroAreas.length > 0 ||
-         filters.populationMin !== null ||
-         filters.populationMax !== null ||
-         filters.areaMin !== null ||
-         filters.areaMax !== null ||
-         filters.metricValueMin !== null ||
-         filters.metricValueMax !== null
+  return (
+    (filters.selectedStates && filters.selectedStates.length > 0 && filters.selectedStates.length < 50) ||
+    (filters.selectedRegions && filters.selectedRegions.length > 0) ||
+    (filters.selectedDivisions && filters.selectedDivisions.length > 0) ||
+    (filters.selectedCongressionalDistricts && filters.selectedCongressionalDistricts.length > 0) ||
+    (filters.selectedAiannh && filters.selectedAiannh.length > 0) ||
+    (filters.selectedUrbanRural && filters.selectedUrbanRural.length > 0) ||
+    (filters.selectedMetroAreas && filters.selectedMetroAreas.length > 0) ||
+    (filters.populationMin !== null && filters.populationMin !== '') ||
+    (filters.populationMax !== null && filters.populationMax !== '') ||
+    (filters.areaMin !== null && filters.areaMin !== '') ||
+    (filters.areaMax !== null && filters.areaMax !== '') ||
+    (filters.metricValueMin !== null && filters.metricValueMin !== '') ||
+    (filters.metricValueMax !== null && filters.metricValueMax !== '')
+  )
 })
 
 const activeFilterCount = computed(() => {
   const filters = store.dimensionFilters
   if (!filters) return 0
-  let count = filters.selectedStates.length +
-              filters.selectedRegions.length +
-              filters.selectedDivisions.length +
-              filters.selectedCongressionalDistricts.length +
-              filters.selectedAiannh.length +
-              filters.selectedUrbanRural.length +
-              filters.selectedMetroAreas.length
-  if (filters.populationMin !== null || filters.populationMax !== null) count++
-  if (filters.areaMin !== null || filters.areaMax !== null) count++
-  if (filters.metricValueMin !== null || filters.metricValueMax !== null) count++
+  let count = 0
+  if (filters.selectedStates && filters.selectedStates.length > 0 && filters.selectedStates.length < 50) count++
+  if (filters.selectedRegions && filters.selectedRegions.length > 0) count++
+  if (filters.selectedDivisions && filters.selectedDivisions.length > 0) count++
+  if (filters.selectedCongressionalDistricts && filters.selectedCongressionalDistricts.length > 0) count++
+  if (filters.selectedAiannh && filters.selectedAiannh.length > 0) count++
+  if (filters.selectedUrbanRural && filters.selectedUrbanRural.length > 0) count++
+  if (filters.selectedMetroAreas && filters.selectedMetroAreas.length > 0) count++
+  if (filters.populationMin !== null && filters.populationMin !== '') count++
+  if (filters.populationMax !== null && filters.populationMax !== '') count++
+  if (filters.areaMin !== null && filters.areaMin !== '') count++
+  if (filters.areaMax !== null && filters.areaMax !== '') count++
+  if (filters.metricValueMin !== null && filters.metricValueMin !== '') count++
+  if (filters.metricValueMax !== null && filters.metricValueMax !== '') count++
   return count
 })
 
@@ -382,20 +321,60 @@ const navigateToState = () => {
   }
 }
 
+const onDatasetChange = async () => {
+  if (!selectedDataset.value) {
+    store.currentDataset = null
+    store.currentYear = null
+    store.currentMetric = null
+    return
+  }
+  try {
+    await store.loadDataset(selectedDataset.value)
+    store.currentDataset = selectedDataset.value
+    if (availableYears.value.length > 0) {
+      selectedYear.value = availableYears.value[0]
+      onYearChange()
+    }
+  } catch (error) {
+    console.error('Failed to load dataset:', error)
+  }
+}
+
+const onYearChange = () => {
+  store.currentYear = selectedYear.value
+  if (availableMetrics.value.length > 0) {
+    selectedMetric.value = availableMetrics.value[0].value
+    onMetricChange()
+  }
+}
+
+const onMetricChange = () => {
+  store.currentMetric = selectedMetric.value
+  if (!store.compareYear) {
+    store.setAutoCompareYear()
+  }
+  store.savePreferences()
+}
+
+const handleCompareYearChange = (event) => {
+  const value = event.target.value
+  if (value === '') {
+    store.setAutoCompareYear()
+  } else {
+    store.compareYear = value
+  }
+}
+
 watch(() => store.manifest, (manifest) => {
   if (manifest?.datasets && manifest.datasets.length > 0) {
     const prefs = store.loadPreferences()
-    if (prefs && prefs.dataset) {
-      const exists = manifest.datasets.some(d => d.source_file === prefs.dataset)
-      if (exists && !store.currentDataset) {
-        selectedDataset.value = prefs.dataset
-        if (prefs.year) selectedYear.value = prefs.year
-        if (prefs.metric) selectedMetric.value = prefs.metric
-        onDatasetChange()
-        return
-      }
+    if (prefs) {
+      if (prefs.dataset) selectedDataset.value = prefs.dataset
+      if (prefs.year) selectedYear.value = prefs.year
+      if (prefs.metric) selectedMetric.value = prefs.metric
+      onDatasetChange()
+      return
     }
-    
     if (!selectedDataset.value && !store.currentDataset) {
       const firstDataset = manifest.datasets[0].source_file
       selectedDataset.value = firstDataset
@@ -403,211 +382,115 @@ watch(() => store.manifest, (manifest) => {
     }
   }
 }, { immediate: true })
+
+watch(() => store.compareYear, (newVal) => {
+  selectedCompareYear.value = newVal || ''
+})
+
+watch(() => selectedYear.value, () => {
+  if (store.compareYear && !compareYears.value.includes(store.compareYear)) {
+    store.setAutoCompareYear()
+  }
+})
 </script>
 
 <style scoped>
 .header {
-  background: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  box-shadow: var(--shadow) !important;
-  border-bottom: var(--border-width-sm) solid var(--border-color) !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: var(--z-index-sticky) !important;
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-index-sticky);
+  width: 100%;
 }
 
-.header * {
-  box-sizing: border-box !important;
+.header-container {
+  max-width: var(--size-container-max);
+  margin: 0 auto;
+  padding: 0;
+  width: 100%;
 }
 
-.container {
-  max-width: var(--size-container-max) !important;
-  margin: 0 auto !important;
-  padding: var(--spacing-sm) var(--spacing-lg) !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.header-content {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  gap: var(--spacing-xs, 0.5rem) !important;
-  margin-bottom: var(--spacing-sm, 0.75rem) !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  height: auto !important;
-  min-height: 3rem !important;
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
 }
 
-.header-left {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-md, 1rem) !important;
-  flex: 1 !important;
-  min-width: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  height: 100% !important;
-}
-
-.header-left > .logo-section {
-  margin-right: 0 !important;
-  padding-right: 0 !important;
-}
-
-.logo-section {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  margin-right: 0 !important;
-  flex-shrink: 0 !important;
-}
-
-.logo-section > * {
-  margin-right: 0 !important;
-  padding-right: 0 !important;
-  flex-shrink: 0 !important;
-}
-
-.logo-section > :deep(.auxo-logo-container) {
-  padding: 0 !important;
-  margin: 0 !important;
-  margin-right: 0 !important;
-  padding-right: 0 !important;
-  display: inline-flex !important;
-  width: auto !important;
-  max-width: 240px !important;
-}
-
-.logo-section > :deep(.auxo-logo-container) svg {
-  margin: 0 !important;
-  padding: 0 !important;
-  display: block !important;
-  width: auto !important;
-  max-width: 240px !important;
-}
-
-.separator-pipe {
-  color: var(--text-tertiary) !important;
-  font-size: 0.875rem !important;
-  font-weight: 300 !important;
-  margin: 0 !important;
-  margin-left: 0.25rem !important;
-  margin-right: 0.25rem !important;
-  padding: 0 !important;
-  line-height: 1 !important;
-  flex-shrink: 0 !important;
-  display: inline-block !important;
-  width: auto !important;
-}
-
-.title-text {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  gap: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-}
-
-.subtitle {
+.header-brand > :deep(.auxo-logo-container) {
   margin: 0;
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  line-height: 1.2;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.brand-separator {
+  width: 1px;
+  height: 2rem;
+  background: var(--border-color);
+  flex-shrink: 0;
+}
+
+.app-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
   white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
-.subtitle.title-inline {
-  margin: 0 !important;
-  padding: 0 !important;
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-  display: inline-block !important;
-  flex-shrink: 0 !important;
-}
-
-.breadcrumb-section {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  min-width: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.header-right {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-xs, 0.5rem) !important;
-  flex-shrink: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  height: 100% !important;
-}
-
-.back-button {
+.header-controls {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
-  background: var(--accent-green);
-  color: var(--text-on-accent);
-  border: none;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--easing-standard);
-  box-shadow: var(--shadow-sm);
-  font-size: 0.8125rem;
-  white-space: nowrap;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
-.back-button:hover {
-  background: var(--accent-green-opacity-85);
-  transform: translateX(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.breadcrumb-trail {
+.btn-view-level,
+.btn-filters,
+.btn-help {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  flex-wrap: wrap;
-  min-width: 0;
-}
-
-.breadcrumb-item {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all var(--duration-fast) var(--easing-standard);
-  font-size: 0.8125rem;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 150px;
+  height: 2.75rem;
+  box-sizing: border-box;
 }
 
-.breadcrumb-item:not(:disabled):hover {
+.btn-view-level {
+  border-color: var(--accent-green);
+  background: var(--accent-green-opacity-10);
+  color: var(--accent-green);
+}
+
+.btn-view-level:hover {
+  background: var(--accent-green-opacity-15);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-filters:hover,
+.btn-help:hover {
   background: var(--bg-surface);
   border-color: var(--accent-green);
   color: var(--accent-green);
@@ -615,270 +498,156 @@ watch(() => store.manifest, (manifest) => {
   box-shadow: var(--shadow-sm);
 }
 
-.breadcrumb-item.root {
-  background: var(--accent-green-opacity-15);
+.btn-filters.active {
+  background: var(--accent-green);
   border-color: var(--accent-green);
-  color: var(--accent-green);
-  font-weight: 600;
+  color: var(--text-on-accent);
 }
 
-.breadcrumb-item.active {
+.btn-filters .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  background: var(--text-on-accent);
+  color: var(--accent-green);
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  margin-left: 0.25rem;
+}
+
+.btn-filters.active .badge {
+  background: var(--bg-card);
+  color: var(--accent-green);
+}
+
+.header-nav {
+  padding: 0.75rem 2rem;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--accent-green);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+  white-space: nowrap;
+}
+
+.btn-back:hover {
+  background: var(--accent-green-opacity-85);
+  transform: translateX(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+  white-space: nowrap;
+}
+
+.breadcrumb-link:hover:not(:disabled) {
+  background: var(--bg-surface);
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  transform: translateY(-1px);
+}
+
+.breadcrumb-link.active {
   background: var(--accent-green);
   border-color: var(--accent-green);
   color: var(--text-on-accent);
   cursor: default;
 }
 
-.breadcrumb-item:disabled {
-  background: var(--bg-card);
-  color: var(--text-tertiary);
+.breadcrumb-link:disabled {
+  opacity: 0.6;
   cursor: default;
 }
 
-.separator {
+.breadcrumb-sep {
   color: var(--text-tertiary);
   flex-shrink: 0;
 }
 
-.level-indicator {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: var(--spacing-xs, 0.5rem) !important;
-  padding: 0.5rem 0.875rem !important;
-  background: var(--bg-elevated) !important;
-  border: 1px solid var(--accent-green) !important;
-  border-radius: var(--radius-md, 0.375rem) !important;
-  height: 2.5rem !important;
-  min-height: 2.5rem !important;
-  max-height: 2.5rem !important;
-  min-width: 140px !important;
-  max-width: 180px !important;
-  flex-shrink: 0 !important;
-  box-sizing: border-box !important;
-  line-height: 1 !important;
-  margin: 0 !important;
-}
-
-.indicator-icon {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
-  width: 28px !important;
-  height: 28px !important;
-  min-width: 28px !important;
-  min-height: 28px !important;
-  max-width: 28px !important;
-  max-height: 28px !important;
-  background: var(--accent-green-opacity-20) !important;
-  border-radius: var(--radius-sm, 0.25rem) !important;
-  color: var(--accent-green) !important;
-  box-shadow: var(--shadow-sm) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1 !important;
-}
-
-.indicator-text {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0 !important;
-  min-width: 0 !important;
-  flex: 1 !important;
-  overflow: hidden !important;
-  justify-content: center !important;
-  align-items: flex-start !important;
-  height: 100% !important;
-  line-height: 1 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.level-label {
-  font-size: 0.6875rem !important;
-  color: var(--text-secondary) !important;
-  font-weight: 500 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  line-height: 1 !important;
-  height: 0.6875rem !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.level-value {
-  font-size: 0.8125rem !important;
-  color: var(--accent-green) !important;
-  font-weight: 700 !important;
-  line-height: 1 !important;
-  height: 0.8125rem !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.loading-bar {
-  height: 2px;
-  background: var(--bg-secondary);
-  overflow: hidden;
-  margin-top: 0.5rem;
-}
-
-.loading-progress {
-  height: 100%;
-  background: var(--accent-green);
-  animation: loading 1.5s ease-in-out infinite;
-}
-
-@keyframes loading {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.header-actions {
-  display: flex !important;
-  gap: var(--spacing-xs, 0.5rem) !important;
-  align-items: center !important;
-  height: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.btn-filters {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 0.5rem !important;
-  padding: 0.5rem 0.875rem !important;
-  background: var(--bg-elevated) !important;
-  color: var(--text-primary) !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: var(--radius-md, 0.375rem) !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: all var(--duration-fast, 0.2s) var(--easing-standard, ease) !important;
-  font-size: 0.8125rem !important;
-  position: relative !important;
-  height: 2.5rem !important;
-  min-height: 2.5rem !important;
-  max-height: 2.5rem !important;
-  min-width: 140px !important;
-  max-width: 180px !important;
-  box-sizing: border-box !important;
-  white-space: nowrap !important;
-  line-height: 1 !important;
-  margin: 0 !important;
-}
-
-.btn-filters:hover {
-  background: var(--bg-surface) !important;
-  border-color: var(--accent-green) !important;
-  color: var(--accent-green) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: var(--shadow-md) !important;
-}
-
-.btn-filters.has-active-filters {
-  border-color: var(--accent-green) !important;
-  background: var(--accent-green-opacity-10) !important;
-  color: var(--accent-green) !important;
-}
-
-.btn-filters .filter-badge {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 1.25rem !important;
-  height: 1.25rem !important;
-  padding: 0 0.375rem !important;
-  background: var(--accent-green) !important;
-  color: var(--bg-card) !important;
-  border-radius: var(--radius-full, 9999px) !important;
-  font-size: 0.6875rem !important;
-  font-weight: 700 !important;
-  margin-left: 0.25rem !important;
-  line-height: 1 !important;
-  flex-shrink: 0 !important;
-}
-
-.btn-help {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  background: var(--bg-elevated) !important;
-  color: var(--text-primary) !important;
-  border: var(--border-width-sm) solid var(--border-color) !important;
-  border-radius: var(--radius-md) !important;
-  font-weight: var(--font-weight-semibold) !important;
-  cursor: pointer !important;
-  transition: all var(--duration-fast) var(--easing-standard) !important;
-  font-size: var(--font-size-base) !important;
-  height: var(--size-button-height-md) !important;
-  box-sizing: border-box !important;
-  white-space: nowrap !important;
-}
-
-.btn-help:hover {
-  background: var(--bg-surface);
-  border-color: var(--accent-green);
-  color: var(--accent-green);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.header-filters {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.875rem;
+.header-filters-bar {
+  padding: 1rem 2rem;
   background: var(--bg-card);
-  padding: 0.875rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
 }
 
-.control-group {
+.filter-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.filter-item {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 0.5rem;
 }
 
-.control-group label {
-  font-weight: 600;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+.filter-item label {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.control-group label svg {
+.filter-item label svg {
   color: var(--accent-green);
   flex-shrink: 0;
 }
 
-.control-group select,
-.control-group input[type="text"] {
+.filter-item select,
+.filter-item input {
   padding: 0.625rem 0.875rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  font-size: 0.875rem;
   background: var(--bg-elevated);
   color: var(--text-primary);
-  transition: all var(--duration-fast) var(--easing-standard);
+  font-size: 0.875rem;
   font-weight: 500;
+  transition: all var(--duration-fast) var(--easing-standard);
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A3E635' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -887,153 +656,153 @@ watch(() => store.manifest, (manifest) => {
   padding-right: 2.5rem;
 }
 
-.control-group select:focus,
-.control-group input[type="text"]:focus {
+.filter-item select:focus,
+.filter-item input:focus {
   outline: none;
   border-color: var(--accent-green);
   box-shadow: var(--shadow-focus-sm);
   background-color: var(--bg-surface);
 }
 
-.control-group select:hover:not(:disabled) {
+.filter-item select:hover:not(:disabled) {
   border-color: var(--border-color-light);
   background-color: var(--bg-surface);
 }
 
-.control-group select:disabled,
-.control-group input[type="text"]:disabled {
+.filter-item select:disabled,
+.filter-item input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: var(--bg-secondary);
 }
 
-.search-input-wrapper {
+.filter-search {
+  grid-column: span 2;
+}
+
+.search-wrapper {
   position: relative;
 }
 
-.search-input-wrapper input {
+.search-wrapper input {
   width: 100%;
   padding-right: 2.5rem;
 }
 
-.search-input-wrapper input::placeholder {
-  color: var(--text-tertiary);
-  opacity: 0.6;
-}
-
-.clear-search {
+.btn-clear-search {
   position: absolute;
   right: 0.5rem;
   top: 50%;
   transform: translateY(-50%);
   background: transparent;
-  color: var(--text-secondary);
   border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
   border-radius: var(--radius-sm);
-  width: 24px;
-  height: 24px;
+  transition: all var(--duration-fast) var(--easing-standard);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--easing-standard);
-  opacity: 0.7;
 }
 
-.clear-search:hover {
+.btn-clear-search:hover {
   background: var(--bg-surface);
   color: var(--text-primary);
-  opacity: 1;
-  transform: translateY(-50%) scale(1.1);
+}
+
+.loading-indicator {
+  height: 2px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.loading-bar {
+  height: 100%;
+  background: var(--accent-green);
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 @media (max-width: 1024px) {
-  .header-filters {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
-}
-
-@media (max-width: 1024px) {
-  .header-left {
-    flex-wrap: wrap;
+  .header-top {
+    padding: 0.875rem 1.5rem;
   }
 
-  .breadcrumb-section {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    width: 100%;
+  .header-nav {
+    padding: 0.625rem 1.5rem;
   }
 
-  .header-right {
-    flex-wrap: wrap;
-    gap: 0.75rem;
+  .header-filters-bar {
+    padding: 0.875rem 1.5rem;
   }
 
-  .level-indicator {
-    min-width: auto;
+  .filter-controls {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+
+  .filter-search {
+    grid-column: span 1;
   }
 }
 
 @media (max-width: 768px) {
-  .container {
-    padding: 0.5rem 1rem;
-  }
-
-  .header-content {
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: stretch;
-    margin-bottom: 0.625rem;
-  }
-
-  .header-left {
+  .header-top {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
+    gap: 1rem;
+    padding: 1rem;
   }
 
-  .logo-section {
-    width: 100%;
-    gap: 0.5rem;
+  .header-brand {
+    justify-content: center;
   }
 
-  .separator-pipe {
-    display: none;
+  .header-controls {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
-  .header-right {
-    width: 100%;
+  .header-nav {
+    padding: 0.75rem 1rem;
+  }
+
+  .nav-breadcrumbs {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .header-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .subtitle {
-    font-size: 0.75rem;
-  }
-
-  .header-filters {
-    grid-template-columns: 1fr;
-    padding: 0.75rem;
     gap: 0.75rem;
   }
 
-  .breadcrumb-item span {
-    max-width: 100px;
-  }
-
-  .back-button {
+  .btn-back {
     width: 100%;
     justify-content: center;
   }
 
-  .level-indicator {
-    width: 100%;
+  .header-filters-bar {
+    padding: 1rem;
+  }
+
+  .filter-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-search {
+    grid-column: span 1;
+  }
+
+  .app-title {
+    font-size: 1rem;
+  }
+
+  .btn-view-level,
+  .btn-filters,
+  .btn-help {
+    flex: 1;
+    justify-content: center;
+    min-width: 120px;
   }
 }
 </style>

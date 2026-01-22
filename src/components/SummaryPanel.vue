@@ -234,7 +234,7 @@ import {
 } from 'lucide-vue-next'
 
 const store = useCensusStore()
-const isExpanded = ref(true)
+const isExpanded = ref(false)
 
 const levelLabel = computed(() => {
   const labels = {

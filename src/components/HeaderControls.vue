@@ -421,6 +421,10 @@ watch(() => store.manifest, (manifest) => {
   padding: 0 !important;
 }
 
+.header * {
+  box-sizing: border-box !important;
+}
+
 .container {
   max-width: var(--size-container-max) !important;
   margin: 0 auto !important;
@@ -433,20 +437,23 @@ watch(() => store.manifest, (manifest) => {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  margin-bottom: var(--spacing-sm) !important;
+  gap: var(--spacing-xs, 0.5rem) !important;
+  margin-bottom: var(--spacing-sm, 0.75rem) !important;
   width: 100% !important;
   box-sizing: border-box !important;
+  height: auto !important;
+  min-height: 3rem !important;
 }
 
 .header-left {
   display: flex !important;
   align-items: center !important;
-  gap: var(--spacing-sm) !important;
+  gap: var(--spacing-xs, 0.5rem) !important;
   flex: 1 !important;
   min-width: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
+  height: 100% !important;
 }
 
 .logo-section {
@@ -455,6 +462,12 @@ watch(() => store.manifest, (manifest) => {
   gap: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
+  margin-right: 0 !important;
+}
+
+.logo-section > * {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
 }
 
 .logo-section > :deep(.auxo-logo-container) {
@@ -462,6 +475,13 @@ watch(() => store.manifest, (manifest) => {
   margin: 0 !important;
   margin-right: 0 !important;
   padding-right: 0 !important;
+  display: inline-flex !important;
+}
+
+.logo-section > :deep(.auxo-logo-container) svg {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
 }
 
 .separator-pipe {
@@ -469,10 +489,12 @@ watch(() => store.manifest, (manifest) => {
   font-size: 0.875rem !important;
   font-weight: 300 !important;
   margin: 0 !important;
-  margin-left: 0.25rem !important;
-  margin-right: 0.25rem !important;
+  margin-left: 0.0625rem !important;
+  margin-right: 0.0625rem !important;
   padding: 0 !important;
   line-height: 1 !important;
+  flex-shrink: 0 !important;
+  display: inline-block !important;
 }
 
 .title-text {
@@ -482,6 +504,8 @@ watch(() => store.manifest, (manifest) => {
   gap: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
 }
 
 .subtitle {
@@ -507,10 +531,11 @@ watch(() => store.manifest, (manifest) => {
 .header-right {
   display: flex !important;
   align-items: center !important;
-  gap: var(--spacing-sm) !important;
+  gap: var(--spacing-xs, 0.5rem) !important;
   flex-shrink: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
+  height: 100% !important;
 }
 
 .back-button {
@@ -599,16 +624,21 @@ watch(() => store.manifest, (manifest) => {
 .level-indicator {
   display: flex !important;
   align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
+  justify-content: flex-start !important;
+  gap: var(--spacing-xs, 0.5rem) !important;
+  padding: 0.5rem 0.875rem !important;
   background: var(--bg-elevated) !important;
-  border: var(--border-width-sm) solid var(--accent-green) !important;
-  border-radius: var(--radius-md) !important;
-  height: var(--size-button-height-md) !important;
+  border: 1px solid var(--accent-green) !important;
+  border-radius: var(--radius-md, 0.375rem) !important;
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+  max-height: 2.5rem !important;
   min-width: 140px !important;
   max-width: 180px !important;
   flex-shrink: 0 !important;
   box-sizing: border-box !important;
+  line-height: 1 !important;
+  margin: 0 !important;
 }
 
 .indicator-icon {
@@ -616,12 +646,19 @@ watch(() => store.manifest, (manifest) => {
   align-items: center !important;
   justify-content: center !important;
   flex-shrink: 0 !important;
-  width: var(--size-icon-2xl) !important;
-  height: var(--size-icon-2xl) !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
   background: var(--accent-green-opacity-20) !important;
-  border-radius: var(--radius-sm) !important;
+  border-radius: var(--radius-sm, 0.25rem) !important;
   color: var(--accent-green) !important;
   box-shadow: var(--shadow-sm) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
 }
 
 .indicator-text {
@@ -631,28 +668,40 @@ watch(() => store.manifest, (manifest) => {
   min-width: 0 !important;
   flex: 1 !important;
   overflow: hidden !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  height: 100% !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .level-label {
-  font-size: var(--font-size-xs) !important;
+  font-size: 0.6875rem !important;
   color: var(--text-secondary) !important;
-  font-weight: var(--font-weight-medium) !important;
+  font-weight: 500 !important;
   text-transform: uppercase !important;
-  letter-spacing: var(--letter-spacing-tight) !important;
+  letter-spacing: 0.5px !important;
   line-height: 1 !important;
+  height: 0.6875rem !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .level-value {
-  font-size: var(--font-size-base) !important;
+  font-size: 0.8125rem !important;
   color: var(--accent-green) !important;
-  font-weight: var(--font-weight-bold) !important;
+  font-weight: 700 !important;
   line-height: 1 !important;
+  height: 0.8125rem !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .loading-bar {
@@ -679,58 +728,68 @@ watch(() => store.manifest, (manifest) => {
 
 .header-actions {
   display: flex !important;
-  gap: var(--spacing-sm) !important;
+  gap: var(--spacing-xs, 0.5rem) !important;
   align-items: center !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .btn-filters {
   display: flex !important;
   align-items: center !important;
-  gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  padding: 0.5rem 0.875rem !important;
   background: var(--bg-elevated) !important;
   color: var(--text-primary) !important;
-  border: var(--border-width-sm) solid var(--border-color) !important;
-  border-radius: var(--radius-md) !important;
-  font-weight: var(--font-weight-semibold) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md, 0.375rem) !important;
+  font-weight: 600 !important;
   cursor: pointer !important;
-  transition: all var(--duration-fast) var(--easing-standard) !important;
-  font-size: var(--font-size-base) !important;
+  transition: all var(--duration-fast, 0.2s) var(--easing-standard, ease) !important;
+  font-size: 0.8125rem !important;
   position: relative !important;
-  height: var(--size-button-height-md) !important;
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+  max-height: 2.5rem !important;
   min-width: 140px !important;
   max-width: 180px !important;
   box-sizing: border-box !important;
   white-space: nowrap !important;
+  line-height: 1 !important;
+  margin: 0 !important;
 }
 
 .btn-filters:hover {
-  background: var(--bg-surface);
-  border-color: var(--accent-green);
-  color: var(--accent-green);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  background: var(--bg-surface) !important;
+  border-color: var(--accent-green) !important;
+  color: var(--accent-green) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
 .btn-filters.has-active-filters {
-  border-color: var(--accent-green);
-  background: var(--accent-green-opacity-10);
-  color: var(--accent-green);
+  border-color: var(--accent-green) !important;
+  background: var(--accent-green-opacity-10) !important;
+  color: var(--accent-green) !important;
 }
 
 .btn-filters .filter-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  padding: 0 0.375rem;
-  background: var(--accent-green);
-  color: var(--bg-card);
-  border-radius: var(--radius-full);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  margin-left: 0.25rem;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 1.25rem !important;
+  height: 1.25rem !important;
+  padding: 0 0.375rem !important;
+  background: var(--accent-green) !important;
+  color: var(--bg-card) !important;
+  border-radius: var(--radius-full, 9999px) !important;
+  font-size: 0.6875rem !important;
+  font-weight: 700 !important;
+  margin-left: 0.25rem !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
 }
 
 .btn-help {

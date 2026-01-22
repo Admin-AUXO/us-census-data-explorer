@@ -196,7 +196,7 @@ const getHeatColor = (row) => {
   if (isNaN(value) || value <= 0) return 'transparent'
 
   const intensity = (value - minValue.value) / valueRange.value
-  const alpha = 0.15 + (intensity * 0.5)
+  const alpha = 0.25 + (intensity * 0.45)
   return `rgba(163, 230, 53, ${alpha})`
 }
 

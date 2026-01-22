@@ -61,7 +61,10 @@ const computedHeight = computed(() => {
   align-items: center !important;
   padding: 0 !important;
   margin: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
   line-height: 0 !important;
+  vertical-align: middle !important;
 }
 
 .auxo-logo-container svg {
@@ -70,6 +73,9 @@ const computedHeight = computed(() => {
   display: block !important;
   padding: 0 !important;
   margin: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  vertical-align: middle !important;
 }
 
 @media (max-width: 768px) {

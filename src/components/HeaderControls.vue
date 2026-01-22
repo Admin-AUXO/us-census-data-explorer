@@ -346,6 +346,7 @@ const levelName = computed(() => {
 
 const hasActiveFilters = computed(() => {
   const filters = store.dimensionFilters
+  if (!filters) return false
   return filters.selectedStates.length > 0 ||
          filters.selectedRegions.length > 0 ||
          filters.selectedDivisions.length > 0 ||
@@ -363,6 +364,7 @@ const hasActiveFilters = computed(() => {
 
 const activeFilterCount = computed(() => {
   const filters = store.dimensionFilters
+  if (!filters) return 0
   let count = filters.selectedStates.length +
               filters.selectedRegions.length +
               filters.selectedDivisions.length +
@@ -407,57 +409,79 @@ watch(() => store.manifest, (manifest) => {
 
 <style scoped>
 .header {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  box-shadow: var(--shadow);
-  border-bottom: 1px solid var(--border-color);
-  position: sticky;
-  top: 0;
-  z-index: var(--z-index-sticky);
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow) !important;
+  border-bottom: var(--border-width-sm) solid var(--border-color) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: var(--z-index-sticky) !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0.5rem 1.5rem;
+  max-width: var(--size-container-max) !important;
+  margin: 0 auto !important;
+  padding: var(--spacing-sm) var(--spacing-lg) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.625rem;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  margin-bottom: var(--spacing-sm) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
-  min-width: 0;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .logo-section {
-  display: flex;
-  align-items: center;
-  gap: 0;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.logo-section > :deep(.auxo-logo-container) {
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
 }
 
 .separator-pipe {
-  color: var(--text-tertiary);
-  font-size: 0.875rem;
-  font-weight: 300;
-  margin: 0;
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
+  color: var(--text-tertiary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 300 !important;
+  margin: 0 !important;
+  margin-left: 0.25rem !important;
+  margin-right: 0.25rem !important;
+  padding: 0 !important;
+  line-height: 1 !important;
 }
 
 .title-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .subtitle {
@@ -472,17 +496,21 @@ watch(() => store.manifest, (manifest) => {
 }
 
 .breadcrumb-section {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-shrink: 0;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  flex-shrink: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .back-button {
@@ -569,51 +597,62 @@ watch(() => store.manifest, (manifest) => {
 }
 
 .level-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
-  background: var(--bg-elevated);
-  border: 1px solid var(--accent-green);
-  border-radius: var(--radius-md);
-  min-width: 140px;
-  flex-shrink: 0;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background: var(--bg-elevated) !important;
+  border: var(--border-width-sm) solid var(--accent-green) !important;
+  border-radius: var(--radius-md) !important;
+  height: var(--size-button-height-md) !important;
+  min-width: 140px !important;
+  max-width: 180px !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .indicator-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: var(--accent-green-opacity-20);
-  border-radius: var(--radius-sm);
-  color: var(--accent-green);
-  box-shadow: var(--shadow-sm);
-  flex-shrink: 0;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  width: var(--size-icon-2xl) !important;
+  height: var(--size-icon-2xl) !important;
+  background: var(--accent-green-opacity-20) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--accent-green) !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
 .indicator-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  min-width: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+  overflow: hidden !important;
 }
 
 .level-label {
-  font-size: 0.6875rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  line-height: 1;
+  font-size: var(--font-size-xs) !important;
+  color: var(--text-secondary) !important;
+  font-weight: var(--font-weight-medium) !important;
+  text-transform: uppercase !important;
+  letter-spacing: var(--letter-spacing-tight) !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .level-value {
-  font-size: 0.8125rem;
-  color: var(--accent-green);
-  font-weight: 700;
-  line-height: 1;
+  font-size: var(--font-size-base) !important;
+  color: var(--accent-green) !important;
+  font-weight: var(--font-weight-bold) !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .loading-bar {
@@ -639,24 +678,30 @@ watch(() => store.manifest, (manifest) => {
 }
 
 .header-actions {
-  display: flex;
-  gap: 0.75rem;
+  display: flex !important;
+  gap: var(--spacing-sm) !important;
+  align-items: center !important;
 }
 
 .btn-filters {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--easing-standard);
-  font-size: 0.8125rem;
-  position: relative;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background: var(--bg-elevated) !important;
+  color: var(--text-primary) !important;
+  border: var(--border-width-sm) solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  cursor: pointer !important;
+  transition: all var(--duration-fast) var(--easing-standard) !important;
+  font-size: var(--font-size-base) !important;
+  position: relative !important;
+  height: var(--size-button-height-md) !important;
+  min-width: 140px !important;
+  max-width: 180px !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
 }
 
 .btn-filters:hover {
@@ -689,18 +734,21 @@ watch(() => store.manifest, (manifest) => {
 }
 
 .btn-help {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--easing-standard);
-  font-size: 0.8125rem;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background: var(--bg-elevated) !important;
+  color: var(--text-primary) !important;
+  border: var(--border-width-sm) solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  cursor: pointer !important;
+  transition: all var(--duration-fast) var(--easing-standard) !important;
+  font-size: var(--font-size-base) !important;
+  height: var(--size-button-height-md) !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
 }
 
 .btn-help:hover {

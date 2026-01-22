@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, watch } from 'vue'
 import Papa from 'papaparse'
 
 export const useCensusStore = defineStore('census', () => {
@@ -18,6 +18,11 @@ export const useCensusStore = defineStore('census', () => {
   })
 
   const dataCache = ref(new Map())
+  const levelLoadingState = ref({
+    state: false,
+    county: false,
+    zcta5: false
+  })
   const sortColumn = ref(null)
   const sortDirection = ref('asc')
   const isLoading = ref(false)
@@ -61,16 +66,18 @@ export const useCensusStore = defineStore('census', () => {
         dataset = data.value.state
         break
       case 'county':
-        dataset = data.value.county?.filter(d => d.state_name === currentState.value)
+        if (!data.value.county) return null
+        dataset = data.value.county.filter(d => d.state_name === currentState.value)
         break
       case 'zcta5':
-        dataset = data.value.zcta5?.filter(d =>
+        if (!data.value.zcta5) return null
+        dataset = data.value.zcta5.filter(d =>
           d.state_name === currentState.value && d.county_name === currentCounty.value
         )
         break
     }
 
-    if (!dataset) return null
+    if (!dataset || dataset.length === 0) return null
 
     let filtered = dataset
 
@@ -269,45 +276,87 @@ export const useCensusStore = defineStore('census', () => {
     }
   }
 
-  const loadDataset = async (filename) => {
-    const cacheKey = `dataset_${filename}`
-
+  const loadDatasetLevel = async (filename, level) => {
+    const cacheKey = `${filename}_${level}`
+    
     if (dataCache.value.has(cacheKey)) {
       const cached = dataCache.value.get(cacheKey)
-      data.value = cached
+      data.value[level] = cached
       return cached
+    }
+
+    levelLoadingState.value[level] = true
+    if (level === 'state') isLoading.value = true
+
+    try {
+      const baseName = filename.replace('.csv', '')
+      const response = await fetch(`./data/${baseName}_${level}.csv`)
+
+      if (!response.ok) {
+        throw new Error(`Failed to load ${level} data file`)
+      }
+
+      const levelData = await response.text().then(parseCSV)
+      
+      data.value[level] = levelData
+      dataCache.value.set(cacheKey, levelData)
+
+      return levelData
+    } catch (error) {
+      console.error(`Failed to load ${level} dataset:`, error)
+      throw error
+    } finally {
+      levelLoadingState.value[level] = false
+      if (level === 'state') isLoading.value = false
+    }
+  }
+
+  const loadDataset = async (filename) => {
+    const baseName = filename.replace('.csv', '')
+    
+    const hasState = dataCache.value.has(`${baseName}_state`)
+    const hasCounty = dataCache.value.has(`${baseName}_county`)
+    const hasZcta5 = dataCache.value.has(`${baseName}_zcta5`)
+    
+    if (hasState && hasCounty && hasZcta5) {
+      data.value = {
+        state: dataCache.value.get(`${baseName}_state`),
+        county: dataCache.value.get(`${baseName}_county`),
+        zcta5: dataCache.value.get(`${baseName}_zcta5`)
+      }
+      return data.value
+    }
+
+    if (hasState) {
+      data.value.state = dataCache.value.get(`${baseName}_state`)
+    }
+    if (hasCounty) {
+      data.value.county = dataCache.value.get(`${baseName}_county`)
+    }
+    if (hasZcta5) {
+      data.value.zcta5 = dataCache.value.get(`${baseName}_zcta5`)
     }
 
     isLoading.value = true
 
     try {
-      const baseName = filename.replace('.csv', '')
-      const [stateRes, countyRes, zcta5Res] = await Promise.all([
-        fetch(`./data/${baseName}_state.csv`),
-        fetch(`./data/${baseName}_county.csv`),
-        fetch(`./data/${baseName}_zcta5.csv`)
-      ])
-
-      if (!stateRes.ok || !countyRes.ok || !zcta5Res.ok) {
-        throw new Error('Failed to load data files')
+      if (!hasState) {
+        await loadDatasetLevel(filename, 'state')
+      }
+      
+      if ((currentLevel.value === 'county' || currentState.value) && !hasCounty) {
+        await loadDatasetLevel(filename, 'county')
+      }
+      
+      if ((currentLevel.value === 'zcta5' || (currentState.value && currentCounty.value)) && !hasZcta5) {
+        await loadDatasetLevel(filename, 'zcta5')
       }
 
-      const [stateData, countyData, zcta5Data] = await Promise.all([
-        stateRes.text().then(parseCSV),
-        countyRes.text().then(parseCSV),
-        zcta5Res.text().then(parseCSV)
-      ])
-
-      const loadedData = {
-        state: stateData,
-        county: countyData,
-        zcta5: zcta5Data
+      if (currentLevel.value === 'state' && !hasCounty) {
+        setTimeout(() => preloadNextLevel(), 2000)
       }
 
-      data.value = loadedData
-      dataCache.value.set(cacheKey, loadedData)
-
-      return loadedData
+      return data.value
     } catch (error) {
       console.error('Failed to load dataset:', error)
       throw error
@@ -347,27 +396,45 @@ export const useCensusStore = defineStore('census', () => {
     }
   }
 
-  const drillToState = (stateName) => {
+  const drillToState = async (stateName) => {
     isLevelTransitioning.value = true
-    setTimeout(() => {
+    setTimeout(async () => {
       currentState.value = stateName
       currentCounty.value = null
       currentLevel.value = 'county'
       sortColumn.value = null
       sortDirection.value = 'asc'
+      
+      if (currentDataset.value && !data.value.county) {
+        try {
+          await loadDatasetLevel(currentDataset.value, 'county')
+        } catch (error) {
+          console.error('Failed to preload county data:', error)
+        }
+      }
+      
       setTimeout(() => {
         isLevelTransitioning.value = false
       }, 300)
     }, 200)
   }
 
-  const drillToCounty = (countyName) => {
+  const drillToCounty = async (countyName) => {
     isLevelTransitioning.value = true
-    setTimeout(() => {
+    setTimeout(async () => {
       currentCounty.value = countyName
       currentLevel.value = 'zcta5'
       sortColumn.value = null
       sortDirection.value = 'asc'
+      
+      if (currentDataset.value && !data.value.zcta5) {
+        try {
+          await loadDatasetLevel(currentDataset.value, 'zcta5')
+        } catch (error) {
+          console.error('Failed to preload zcta5 data:', error)
+        }
+      }
+      
       setTimeout(() => {
         isLevelTransitioning.value = false
       }, 300)
@@ -496,6 +563,63 @@ export const useCensusStore = defineStore('census', () => {
     }, 300)
   }, { deep: true })
 
+  const preloadNextLevel = async () => {
+    if (!currentDataset.value) return
+    
+    if (currentLevel.value === 'state' && !data.value.county && !levelLoadingState.value.county) {
+      try {
+        await loadDatasetLevel(currentDataset.value, 'county')
+      } catch (error) {
+        console.error('Failed to preload county data:', error)
+      }
+    } else if (currentLevel.value === 'county' && currentState.value && !data.value.zcta5 && !levelLoadingState.value.zcta5) {
+      try {
+        await loadDatasetLevel(currentDataset.value, 'zcta5')
+      } catch (error) {
+        console.error('Failed to preload zcta5 data:', error)
+      }
+    }
+  }
+
+  watch(() => currentLevel.value, async (newLevel) => {
+    if (!currentDataset.value) return
+    
+    if (newLevel === 'county' && !data.value.county && !levelLoadingState.value.county) {
+      try {
+        await loadDatasetLevel(currentDataset.value, 'county')
+      } catch (error) {
+        console.error('Failed to load county data:', error)
+      }
+    } else if (newLevel === 'zcta5' && !data.value.zcta5 && !levelLoadingState.value.zcta5) {
+      try {
+        await loadDatasetLevel(currentDataset.value, 'zcta5')
+      } catch (error) {
+        console.error('Failed to load zcta5 data:', error)
+      }
+    }
+  })
+
+  watch(() => [currentState.value, currentLevel.value], async () => {
+    if (currentLevel.value === 'state' && currentState.value) {
+      setTimeout(() => preloadNextLevel(), 1000)
+    }
+  })
+
+  watch(() => currentDataset.value, async (newDataset) => {
+    if (!newDataset) return
+    
+    if (currentLevel.value === 'state' && !data.value.state) {
+      await loadDatasetLevel(newDataset, 'state')
+    } else if (currentLevel.value === 'county') {
+      if (!data.value.state) await loadDatasetLevel(newDataset, 'state')
+      if (!data.value.county) await loadDatasetLevel(newDataset, 'county')
+    } else if (currentLevel.value === 'zcta5') {
+      if (!data.value.state) await loadDatasetLevel(newDataset, 'state')
+      if (!data.value.county) await loadDatasetLevel(newDataset, 'county')
+      if (!data.value.zcta5) await loadDatasetLevel(newDataset, 'zcta5')
+    }
+  })
+
   return {
     currentLevel,
     currentState,
@@ -511,6 +635,7 @@ export const useCensusStore = defineStore('census', () => {
     isLoading,
     isLevelTransitioning,
     isFiltering,
+    levelLoadingState,
     manifest,
     searchQuery,
     dimensionFilters,
@@ -525,6 +650,8 @@ export const useCensusStore = defineStore('census', () => {
     resetFilters,
     loadManifest,
     loadDataset,
+    loadDatasetLevel,
+    preloadNextLevel,
     sortData,
     toggleSort,
     drillToState,

@@ -57,13 +57,19 @@ const computedHeight = computed(() => {
 
 <style scoped>
 .auxo-logo-container {
-  display: inline-flex;
-  align-items: center;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 0 !important;
 }
 
 .auxo-logo-container svg {
-  max-width: 100%;
-  height: auto;
+  max-width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 @media (max-width: 768px) {

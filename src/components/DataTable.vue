@@ -462,6 +462,8 @@ const exportCSV = () => {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   min-width: 200px;
   animation: scaleIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .filtering-spinner {
@@ -513,6 +515,7 @@ const exportCSV = () => {
   margin-bottom: 1rem;
   flex-wrap: wrap;
   animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
 }
 
 @keyframes fadeInUp {

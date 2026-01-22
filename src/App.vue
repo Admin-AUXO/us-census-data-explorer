@@ -203,11 +203,11 @@ onUnmounted(() => {
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(-8px);
+    transform: scale(0.95) translateY(-8px) translateZ(0);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1) translateY(0) translateZ(0);
   }
 }
 

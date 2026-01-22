@@ -233,6 +233,7 @@ body {
   border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
               transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: background-color, transform;
 }
 
 .data-table tbody tr:hover {
@@ -288,7 +289,8 @@ body {
   font-variant-numeric: tabular-nums;
   position: relative;
   z-index: 1;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
+  will-change: background-color, color, text-shadow;
 }
 
 .change-container {

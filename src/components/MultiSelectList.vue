@@ -618,6 +618,7 @@ const deselectAll = () => {
 .list-move {
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
   will-change: transform !important;
+  transform: translateZ(0) !important;
 }
 
 .fade-enter-active,

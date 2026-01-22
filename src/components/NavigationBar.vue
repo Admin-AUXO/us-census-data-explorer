@@ -91,7 +91,7 @@ const levelName = computed(() => {
 })
 
 const navigateToState = () => {
-  if (store.currentLevel === 'zcta5') {
+  if (store.currentLevel === 'zcta5' || store.currentLevel === 'county') {
     store.goBack()
   }
 }

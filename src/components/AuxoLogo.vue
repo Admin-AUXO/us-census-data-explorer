@@ -1,8 +1,7 @@
 <template>
   <div class="auxo-logo-container">
-    <svg :width="computedWidth" :height="computedHeight" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg">
-      <!-- Logo positioned on the left, vertically centered with text -->
-      <g transform="translate(10, 40)">
+    <svg :width="computedWidth" :height="computedHeight" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(0, 8)">
         <rect x="0" y="0" width="24" height="24" fill="#A3E635" rx="2"/>
         <text x="12" y="18" text-anchor="middle" font-family="Montserrat, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" font-weight="900" font-size="16" fill="#000000">A</text>
         <rect x="28" y="0" width="24" height="24" fill="#A3E635" rx="2"/>
@@ -12,14 +11,9 @@
         <rect x="28" y="28" width="24" height="24" fill="#A3E635" rx="2"/>
         <text x="40" y="46" text-anchor="middle" font-family="Montserrat, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" font-weight="900" font-size="16" fill="#000000">O</text>
       </g>
-
-      <!-- Text container positioned to the right of logo, vertically centered -->
-      <g transform="translate(70, 70)">
-        <!-- Data Labs Text -->
-        <text x="0" y="-10" dominant-baseline="middle" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF" letter-spacing="-0.02em">Data Labs</text>
-
-        <!-- Look Beyond Data Tagline -->
-        <text x="0" y="15" dominant-baseline="middle" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" font-size="16" font-weight="600" font-style="italic" fill="#A3E635" letter-spacing="-0.01em">Look Beyond Data</text>
+      <g transform="translate(60, 30)">
+        <text x="0" y="0" dominant-baseline="middle" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" font-size="20" font-weight="800" fill="#FFFFFF" letter-spacing="-0.02em">Data Labs</text>
+        <text x="0" y="18" dominant-baseline="middle" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" font-size="12" font-weight="600" font-style="italic" fill="#A3E635" letter-spacing="-0.01em">Look Beyond Data</text>
       </g>
     </svg>
   </div>
@@ -38,18 +32,18 @@ const props = defineProps({
 
 const computedWidth = computed(() => {
   const sizes = {
-    small: 180,
-    normal: 240,
-    large: 360
+    small: 140,
+    normal: 180,
+    large: 260
   }
   return sizes[props.size] || sizes.normal
 })
 
 const computedHeight = computed(() => {
   const sizes = {
-    small: 70,
-    normal: 93,
-    large: 140
+    small: 50,
+    normal: 60,
+    large: 90
   }
   return sizes[props.size] || sizes.normal
 })

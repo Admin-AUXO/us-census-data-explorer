@@ -423,7 +423,7 @@ watch(() => selectedYear.value, () => {
 .header-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
@@ -435,7 +435,7 @@ watch(() => selectedYear.value, () => {
 
 .brand-separator {
   width: 1px;
-  height: 1.5rem;
+  height: 1.25rem;
   background: var(--border-color);
   flex-shrink: 0;
 }

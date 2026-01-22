@@ -95,11 +95,11 @@
             </div>
           </div>
 
-          <!-- Trend & Aggregates -->
+          <!-- Trend Analysis -->
           <div class="summary-card card-trend">
             <div class="card-header">
               <TrendingUp :size="20" />
-              <h3>Trends & Aggregates</h3>
+              <h3>Trend Analysis</h3>
             </div>
             <div class="card-content">
               <div v-if="trendInfo.yoyChange !== null" class="metric-row">
@@ -120,6 +120,20 @@
                   {{ trendInfo.trendDirection }}
                 </span>
               </div>
+              <div v-if="trendInfo.volatility !== null" class="metric-row">
+                <span class="metric-label">Volatility</span>
+                <span class="metric-value">{{ trendInfo.volatility.toFixed(2) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aggregates -->
+          <div class="summary-card card-accent">
+            <div class="card-header">
+              <Activity :size="20" />
+              <h3>Aggregates</h3>
+            </div>
+            <div class="card-content">
               <div class="metric-row">
                 <span class="metric-label">Total Sum</span>
                 <span class="metric-value bold">{{ formatValue(stats.sum) }}</span>
@@ -150,8 +164,13 @@
                 <div class="performer-list">
                   <div v-for="(item, idx) in topPerformers" :key="idx" class="performer-item top">
                     <span class="rank">#{{ idx + 1 }}</span>
-                    <span class="name">{{ item.name }}</span>
-                    <span class="value">{{ formatValue(item.value) }}</span>
+                    <div class="performer-info">
+                      <span class="name">{{ item.name }}</span>
+                      <span class="value">{{ formatValue(item.value) }}</span>
+                      <span v-if="item.changePercent !== null" :class="['performer-change', item.changeClass]">
+                        {{ item.changePercent > 0 ? '+' : '' }}{{ item.changePercent.toFixed(1) }}%
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -163,8 +182,13 @@
                 <div class="performer-list">
                   <div v-for="(item, idx) in bottomPerformers" :key="idx" class="performer-item bottom">
                     <span class="rank">#{{ idx + 1 }}</span>
-                    <span class="name">{{ item.name }}</span>
-                    <span class="value">{{ formatValue(item.value) }}</span>
+                    <div class="performer-info">
+                      <span class="name">{{ item.name }}</span>
+                      <span class="value">{{ formatValue(item.value) }}</span>
+                      <span v-if="item.changePercent !== null" :class="['performer-change', item.changeClass]">
+                        {{ item.changePercent > 0 ? '+' : '' }}{{ item.changePercent.toFixed(1) }}%
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -292,11 +316,33 @@ const skewnessClass = computed(() => {
 const topPerformers = computed(() => {
   if (!store.currentMetric || !store.filteredData) return []
 
+  const baseMetric = store.currentMetric.replace(/_\d{4}$/, '')
+  const compareYear = store.compareYear
+
   const data = store.filteredData
-    .map(row => ({
-      name: getPrimaryName(row),
-      value: parseFloat(row[store.currentMetric])
-    }))
+    .map(row => {
+      const current = parseFloat(row[store.currentMetric])
+      let change = null
+      let changePercent = null
+      let changeClass = 'change-neutral'
+
+      if (compareYear) {
+        const compare = parseFloat(row[`${baseMetric}_${compareYear}`])
+        if (!isNaN(current) && !isNaN(compare) && compare > 0) {
+          change = current - compare
+          changePercent = ((current - compare) / compare) * 100
+          changeClass = changePercent > 0 ? 'change-positive' : changePercent < 0 ? 'change-negative' : 'change-neutral'
+        }
+      }
+
+      return {
+        name: getPrimaryName(row),
+        value: current,
+        change,
+        changePercent,
+        changeClass
+      }
+    })
     .filter(item => !isNaN(item.value) && item.value > 0)
     .sort((a, b) => b.value - a.value)
     .slice(0, 3)
@@ -307,11 +353,33 @@ const topPerformers = computed(() => {
 const bottomPerformers = computed(() => {
   if (!store.currentMetric || !store.filteredData) return []
 
+  const baseMetric = store.currentMetric.replace(/_\d{4}$/, '')
+  const compareYear = store.compareYear
+
   const data = store.filteredData
-    .map(row => ({
-      name: getPrimaryName(row),
-      value: parseFloat(row[store.currentMetric])
-    }))
+    .map(row => {
+      const current = parseFloat(row[store.currentMetric])
+      let change = null
+      let changePercent = null
+      let changeClass = 'change-neutral'
+
+      if (compareYear) {
+        const compare = parseFloat(row[`${baseMetric}_${compareYear}`])
+        if (!isNaN(current) && !isNaN(compare) && compare > 0) {
+          change = current - compare
+          changePercent = ((current - compare) / compare) * 100
+          changeClass = changePercent > 0 ? 'change-positive' : changePercent < 0 ? 'change-negative' : 'change-neutral'
+        }
+      }
+
+      return {
+        name: getPrimaryName(row),
+        value: current,
+        change,
+        changePercent,
+        changeClass
+      }
+    })
     .filter(item => !isNaN(item.value) && item.value > 0)
     .sort((a, b) => a.value - b.value)
     .slice(0, 3)
@@ -536,7 +604,7 @@ const trendInfo = computed(() => {
 
 @media (min-width: 1200px) {
   .summary-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
   }
   
   .card-full {
@@ -722,11 +790,10 @@ const trendInfo = computed(() => {
 }
 
 .performer-item {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
   gap: 0.75rem;
-  align-items: center;
-  padding: 0.75rem;
+  align-items: flex-start;
+  padding: 0.875rem;
   border-radius: var(--radius-md);
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
@@ -751,20 +818,55 @@ const trendInfo = computed(() => {
   font-weight: 700;
   color: var(--text-secondary);
   font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.performer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .performer-item .name {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 0.9rem;
 }
 
 .performer-item .value {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--accent-green);
-  font-size: 0.95rem;
+  font-size: 1rem;
+}
+
+.performer-change {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  width: fit-content;
+}
+
+.performer-change.change-positive {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.performer-change.change-negative {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.performer-change.change-neutral {
+  color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
 }
 
 .expand-enter-active,

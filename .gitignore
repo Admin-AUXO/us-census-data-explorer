@@ -41,9 +41,10 @@ lerna-debug.log*
 .vite/
 *.tsbuildinfo
 
-# Documentation (keep only README.md)
+# Documentation (keep only README.md and DEPLOY.md)
 *.md
 !README.md
+!DEPLOY.md
 
 # OS files
 Thumbs.db

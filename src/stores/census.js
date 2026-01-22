@@ -31,6 +31,7 @@ export const useCensusStore = defineStore('census', () => {
   const navigationDirection = ref('forward')
   const manifest = ref(null)
   const searchQuery = ref('')
+  const loadingProgress = ref({ loaded: 0, total: 0, percentage: 0, stage: '' })
   
   const dimensionFilters = reactive({
     selectedStates: [],
@@ -233,13 +234,30 @@ export const useCensusStore = defineStore('census', () => {
     return availableYears.value.includes(prevYear) ? prevYear : null
   }
 
-  const parseCSV = async (text) => {
+  const parseCSV = async (text, onProgress) => {
     return new Promise((resolve, reject) => {
+      let rowCount = 0
+      const estimatedTotal = Math.max(1000, text.split('\n').length - 1)
+      
       Papa.parse(text, {
         header: true,
         dynamicTyping: true,
         skipEmptyLines: true,
-        complete: (results) => resolve(results.data),
+        worker: false,
+        fastMode: true,
+        step: (result) => {
+          rowCount++
+          if (onProgress && rowCount % 500 === 0) {
+            const percentage = Math.min(95, Math.round((rowCount / estimatedTotal) * 100))
+            onProgress({ loaded: rowCount, total: estimatedTotal, percentage, stage: 'Parsing data...' })
+          }
+        },
+        complete: (results) => {
+          if (onProgress) {
+            onProgress({ loaded: results.data.length, total: results.data.length, percentage: 100, stage: 'Processing complete' })
+          }
+          resolve(results.data)
+        },
         error: (error) => reject(error)
       })
     })
@@ -273,24 +291,45 @@ export const useCensusStore = defineStore('census', () => {
     try {
       const baseUrl = import.meta.env.BASE_URL
       const baseName = filename.replace('.csv', '')
+      
+      loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: `Fetching ${level} data...` }
+      
       const response = await fetch(`${baseUrl}data/${baseName}_${level}.csv`)
 
       if (!response.ok) {
         throw new Error(`Failed to load ${level} data file`)
       }
 
-      const levelData = await response.text().then(parseCSV)
+      const contentLength = response.headers.get('content-length')
+      if (contentLength) {
+        loadingProgress.value.total = parseInt(contentLength, 10)
+      }
+
+      loadingProgress.value.stage = 'Downloading data...'
+      const text = await response.text()
       
+      loadingProgress.value.stage = 'Parsing CSV data...'
+      const levelData = await parseCSV(text, (progress) => {
+        loadingProgress.value = { ...progress, stage: progress.stage || loadingProgress.value.stage }
+      })
+      
+      loadingProgress.value.stage = 'Finalizing...'
       data.value[level] = levelData
       dataCache.value.set(cacheKey, levelData)
 
+      loadingProgress.value = { loaded: levelData.length, total: levelData.length, percentage: 100, stage: 'Complete' }
+      
       return levelData
     } catch (error) {
       console.error(`Failed to load ${level} dataset:`, error)
+      loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: 'Error occurred' }
       throw error
     } finally {
       levelLoadingState.value[level] = false
       if (level === 'state') isLoading.value = false
+      setTimeout(() => {
+        loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: '' }
+      }, 500)
     }
   }
 
@@ -626,6 +665,7 @@ export const useCensusStore = defineStore('census', () => {
     isLevelTransitioning,
     isFiltering,
     navigationDirection,
+    loadingProgress,
     levelLoadingState,
     manifest,
     searchQuery,

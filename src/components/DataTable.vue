@@ -45,8 +45,13 @@
     <div class="table-container" :class="{ 'filtering': store.isFiltering }">
       <Transition name="fade">
         <div v-if="store.isFiltering" class="filtering-overlay">
-          <div class="filtering-spinner"></div>
-          <span class="filtering-text">Filtering data...</span>
+          <div class="filtering-loader">
+            <div class="filtering-spinner"></div>
+            <div class="filtering-content">
+              <span class="filtering-text">Applying filters...</span>
+              <span class="filtering-subtext">Processing data</span>
+            </div>
+          </div>
         </div>
       </Transition>
       <table class="data-table">
@@ -458,16 +463,29 @@ const exportCSV = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
-  padding: 1.75rem 2.25rem;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  min-width: 200px;
-  animation: scaleIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 220px;
+  animation: scaleIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform, opacity;
   transform: translateZ(0);
+}
+
+.filtering-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.filtering-subtext {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
 }
 
 .filtering-spinner {

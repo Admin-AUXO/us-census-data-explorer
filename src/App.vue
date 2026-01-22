@@ -5,10 +5,30 @@
     <DimensionFilters :is-open="filtersOpen" @close="filtersOpen = false" />
 
     <Transition name="fade">
-      <div v-if="store.isLevelTransitioning" class="level-transition-overlay">
+      <div v-if="store.isLevelTransitioning || store.isLoading" class="level-transition-overlay">
         <div class="transition-loader">
           <div class="loader-spinner"></div>
-          <p class="loader-text">{{ transitionMessage }}</p>
+          <div class="loader-content">
+            <p class="loader-text">{{ transitionMessage }}</p>
+            <p v-if="store.loadingProgress.stage" class="loader-stage">{{ store.loadingProgress.stage }}</p>
+            <div v-if="store.loadingProgress.total > 0" class="loader-progress">
+              <div class="progress-bar">
+                <div 
+                  class="progress-fill" 
+                  :style="{ width: `${store.loadingProgress.percentage}%` }"
+                ></div>
+              </div>
+              <p class="progress-text">
+                <span v-if="store.loadingProgress.loaded > 0">
+                  {{ store.loadingProgress.loaded.toLocaleString() }} 
+                  <span v-if="store.loadingProgress.total > 0">/ {{ store.loadingProgress.total.toLocaleString() }}</span>
+                </span>
+                <span v-if="store.loadingProgress.percentage > 0" class="progress-percentage">
+                  {{ store.loadingProgress.percentage }}%
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </Transition>
@@ -106,10 +126,19 @@ const store = useCensusStore()
 const showHelp = ref(false)
 const filtersOpen = ref(false)
 
-const nextLevelName = computed(() => {
-  if (store.currentLevel === 'state') return 'County Level'
-  if (store.currentLevel === 'county') return 'ZIP Code Level'
-  return 'Data'
+const transitionMessage = computed(() => {
+  if (store.isLevelTransitioning || store.isLoading) {
+    if (store.navigationDirection === 'backward') {
+      if (store.currentLevel === 'county') return 'Returning to State Level'
+      if (store.currentLevel === 'zcta5') return 'Returning to County Level'
+      return 'Returning...'
+    } else {
+      if (store.currentLevel === 'state') return 'Loading County Level...'
+      if (store.currentLevel === 'county') return 'Loading ZIP Code Level...'
+      return 'Loading Data...'
+    }
+  }
+  return 'Loading...'
 })
 
 const handleKeydown = (event) => {
@@ -192,12 +221,14 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-  padding: 2rem;
+  padding: 2rem 2.5rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: scaleIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 280px;
+  max-width: 400px;
 }
 
 @keyframes scaleIn {
@@ -220,13 +251,67 @@ onUnmounted(() => {
   animation: spin 0.7s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
 .loader-text {
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   margin: 0;
   text-align: center;
-  white-space: nowrap;
+}
+
+.loader-stage {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+.loader-progress {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-green), rgba(163, 230, 53, 0.8));
+  border-radius: var(--radius-full);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(163, 230, 53, 0.4);
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.progress-percentage {
+  font-weight: 600;
+  color: var(--accent-green);
 }
 
 @keyframes spin {

@@ -198,6 +198,18 @@ onUnmounted(() => {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .loader-spinner {
@@ -222,7 +234,10 @@ onUnmounted(() => {
   }
 }
 
-.fade-enter-active,
+.fade-enter-active {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .fade-leave-active {
   transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }

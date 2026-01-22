@@ -3,7 +3,7 @@
     <div class="header-container">
       <div class="header-top">
         <div class="header-brand">
-          <AuxoLogo size="normal" />
+          <AuxoLogo size="small" />
           <div class="brand-separator"></div>
           <h1 class="app-title">USA Census Data Explorer</h1>
         </div>
@@ -415,15 +415,15 @@ watch(() => selectedYear.value, () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
-  gap: 1.5rem;
+  padding: 0.625rem 1.5rem;
+  gap: 1rem;
   border-bottom: 1px solid var(--border-color);
 }
 
 .header-brand {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-shrink: 0;
 }
 
@@ -435,13 +435,13 @@ watch(() => selectedYear.value, () => {
 
 .brand-separator {
   width: 1px;
-  height: 2rem;
+  height: 1.5rem;
   background: var(--border-color);
   flex-shrink: 0;
 }
 
 .app-title {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
@@ -453,7 +453,7 @@ watch(() => selectedYear.value, () => {
 .header-controls {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
@@ -462,19 +462,20 @@ watch(() => selectedYear.value, () => {
 .btn-help {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--duration-fast) var(--easing-standard);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
-  height: 2.75rem;
+  height: 2.25rem;
   box-sizing: border-box;
+  will-change: transform, box-shadow;
 }
 
 .btn-view-level {
@@ -485,8 +486,13 @@ watch(() => selectedYear.value, () => {
 
 .btn-view-level:hover {
   background: var(--accent-green-opacity-15);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(163, 230, 53, 0.2);
+}
+
+.btn-view-level:active {
+  transform: translateY(0);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-filters:hover,
@@ -494,8 +500,14 @@ watch(() => selectedYear.value, () => {
   background: var(--bg-surface);
   border-color: var(--accent-green);
   color: var(--accent-green);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(163, 230, 53, 0.15);
+}
+
+.btn-filters:active,
+.btn-help:active {
+  transform: translateY(0);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-filters.active {
@@ -525,7 +537,7 @@ watch(() => selectedYear.value, () => {
 }
 
 .header-nav {
-  padding: 0.75rem 2rem;
+  padding: 0.5rem 1.5rem;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-color);
 }
@@ -533,20 +545,20 @@ watch(() => selectedYear.value, () => {
 .nav-breadcrumbs {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .btn-back {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
+  padding: 0.375rem 0.75rem;
   background: var(--accent-green);
   color: var(--text-on-accent);
   border: none;
   border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all var(--duration-fast) var(--easing-standard);
   white-space: nowrap;
@@ -568,13 +580,13 @@ watch(() => selectedYear.value, () => {
 .breadcrumb-link {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--duration-fast) var(--easing-standard);
@@ -606,20 +618,20 @@ watch(() => selectedYear.value, () => {
 }
 
 .header-filters-bar {
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
   background: var(--bg-card);
 }
 
 .filter-controls {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .filter-item {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 
 .filter-item label {
@@ -640,20 +652,20 @@ watch(() => selectedYear.value, () => {
 
 .filter-item select,
 .filter-item input {
-  padding: 0.625rem 0.875rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   background: var(--bg-elevated);
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   transition: all var(--duration-fast) var(--easing-standard);
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A3E635' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.75rem center;
+  background-position: right 0.625rem center;
   background-size: 12px;
-  padding-right: 2.5rem;
+  padding-right: 2.25rem;
 }
 
 .filter-item select:focus,
@@ -729,15 +741,15 @@ watch(() => selectedYear.value, () => {
 
 @media (max-width: 1024px) {
   .header-top {
-    padding: 0.875rem 1.5rem;
+    padding: 0.5rem 1.25rem;
   }
 
   .header-nav {
-    padding: 0.625rem 1.5rem;
+    padding: 0.375rem 1.25rem;
   }
 
   .header-filters-bar {
-    padding: 0.875rem 1.5rem;
+    padding: 0.625rem 1.25rem;
   }
 
   .filter-controls {
@@ -753,8 +765,8 @@ watch(() => selectedYear.value, () => {
   .header-top {
     flex-direction: column;
     align-items: stretch;
-    gap: 1rem;
-    padding: 1rem;
+    gap: 0.75rem;
+    padding: 0.75rem;
   }
 
   .header-brand {
@@ -767,7 +779,7 @@ watch(() => selectedYear.value, () => {
   }
 
   .header-nav {
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 1rem;
   }
 
   .nav-breadcrumbs {
@@ -782,7 +794,7 @@ watch(() => selectedYear.value, () => {
   }
 
   .header-filters-bar {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .filter-controls {
@@ -794,7 +806,7 @@ watch(() => selectedYear.value, () => {
   }
 
   .app-title {
-    font-size: 1rem;
+    font-size: 0.9375rem;
   }
 
   .btn-view-level,
@@ -803,6 +815,7 @@ watch(() => selectedYear.value, () => {
     flex: 1;
     justify-content: center;
     min-width: 120px;
+    height: 2rem;
   }
 }
 </style>

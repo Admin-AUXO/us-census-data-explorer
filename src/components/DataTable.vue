@@ -21,6 +21,27 @@
       </div>
     </div>
 
+    <div class="heatmap-legend" v-if="sortedData.length > 0 && minValue !== maxValue">
+      <div class="legend-label">Value Range:</div>
+      <div class="legend-gradient">
+        <div class="legend-gradient-bar" :style="getLegendGradientStyle()"></div>
+        <div class="legend-labels">
+          <span class="legend-min">{{ formatValue(minValue) }}</span>
+          <span class="legend-max">{{ formatValue(maxValue) }}</span>
+        </div>
+      </div>
+      <div class="legend-indicators">
+        <span class="legend-indicator">
+          <span class="indicator-color" style="background: rgb(30, 40, 60);"></span>
+          <span>Low</span>
+        </span>
+        <span class="legend-indicator">
+          <span class="indicator-color" style="background: rgb(163, 230, 53);"></span>
+          <span>High</span>
+        </span>
+      </div>
+    </div>
+
     <div class="table-container" :class="{ 'filtering': store.isFiltering }">
       <Transition name="fade">
         <div v-if="store.isFiltering" class="filtering-overlay">
@@ -47,12 +68,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(row, index) in sortedData"
-            :key="index"
-            :class="getRowClass(row)"
-            @click="handleRowClick(row)"
-          >
+          <TransitionGroup name="table-row" tag="tbody">
+            <tr
+              v-for="(row, index) in sortedData"
+              :key="getRowKey(row, index)"
+              :class="getRowClass(row)"
+              @click="handleRowClick(row)"
+            >
             <td class="primary-col col-state">
               {{ getPrimaryValue(row) }}
               <span v-if="isMaxValue(row)" class="value-badge badge-top">Top</span>
@@ -76,7 +98,7 @@
             <td v-if="store.currentLevel === 'zcta5'" class="col-area">
               {{ formatArea(row.land_area_sq_km) }}
             </td>
-            <td class="value-col col-value" :style="{ backgroundColor: getHeatColor(row) }">
+            <td class="value-col col-value" :style="getHeatStyle(row)">
               {{ formatValue(row[store.currentMetric]) }}
             </td>
             <td v-if="hasComparison" class="col-change">
@@ -92,6 +114,7 @@
               {{ getZipCount(row) }}
             </td>
           </tr>
+          </TransitionGroup>
         </tbody>
       </table>
     </div>
@@ -156,6 +179,12 @@ const getPrimaryValue = (row) => {
   return row.zcta5 || 'Unknown'
 }
 
+const getRowKey = (row, index) => {
+  if (store.currentLevel === 'state') return row.state_name || `state-${index}`
+  if (store.currentLevel === 'county') return `${row.state_name}-${row.county_name}` || `county-${index}`
+  return row.zcta5 || `zcta5-${index}`
+}
+
 const getRowClass = (row) => {
   const classes = []
   if (store.currentLevel !== 'zcta5') classes.push('drillable')
@@ -191,13 +220,75 @@ const formatValue = (value) => {
   return num.toLocaleString('en-US', { maximumFractionDigits: 2 })
 }
 
-const getHeatColor = (row) => {
+const getColorForIntensity = (intensity) => {
+  const lowColor = { r: 30, g: 40, b: 60 }
+  const midLowColor = { r: 60, g: 100, b: 150 }
+  const midHighColor = { r: 120, g: 180, b: 100 }
+  const highColor = { r: 163, g: 230, b: 53 }
+  
+  let bgColor
+  if (intensity < 0.33) {
+    const t = intensity / 0.33
+    bgColor = {
+      r: Math.round(lowColor.r + (midLowColor.r - lowColor.r) * t),
+      g: Math.round(lowColor.g + (midLowColor.g - lowColor.g) * t),
+      b: Math.round(lowColor.b + (midLowColor.b - lowColor.b) * t)
+    }
+  } else if (intensity < 0.67) {
+    const t = (intensity - 0.33) / 0.34
+    bgColor = {
+      r: Math.round(midLowColor.r + (midHighColor.r - midLowColor.r) * t),
+      g: Math.round(midLowColor.g + (midHighColor.g - midLowColor.g) * t),
+      b: Math.round(midLowColor.b + (midHighColor.b - midLowColor.b) * t)
+    }
+  } else {
+    const t = (intensity - 0.67) / 0.33
+    bgColor = {
+      r: Math.round(midHighColor.r + (highColor.r - midHighColor.r) * t),
+      g: Math.round(midHighColor.g + (highColor.g - midHighColor.g) * t),
+      b: Math.round(midHighColor.b + (highColor.b - midHighColor.b) * t)
+    }
+  }
+  return bgColor
+}
+
+const getHeatStyle = (row) => {
   const value = parseFloat(row[store.currentMetric])
-  if (isNaN(value) || value <= 0) return 'transparent'
+  if (isNaN(value) || value <= 0) {
+    return {
+      backgroundColor: 'transparent',
+      color: 'var(--text-primary)'
+    }
+  }
 
   const intensity = (value - minValue.value) / valueRange.value
-  const alpha = 0.25 + (intensity * 0.45)
-  return `rgba(163, 230, 53, ${alpha})`
+  const bgColor = getColorForIntensity(intensity)
+  
+  const brightness = (bgColor.r * 299 + bgColor.g * 587 + bgColor.b * 114) / 1000
+  const textColor = brightness > 140 ? '#000000' : '#FFFFFF'
+  const textShadow = brightness > 140 
+    ? '0 1px 2px rgba(255, 255, 255, 0.3)' 
+    : '0 1px 3px rgba(0, 0, 0, 0.5)'
+  
+  return {
+    backgroundColor: `rgb(${bgColor.r}, ${bgColor.g}, ${bgColor.b})`,
+    color: textColor,
+    textShadow: textShadow,
+    fontWeight: '600'
+  }
+}
+
+const getLegendGradientStyle = () => {
+  const lowColor = getColorForIntensity(0)
+  const midColor = getColorForIntensity(0.5)
+  const highColor = getColorForIntensity(1)
+  
+  return {
+    background: `linear-gradient(to right, 
+      rgb(${lowColor.r}, ${lowColor.g}, ${lowColor.b}), 
+      rgb(${midColor.r}, ${midColor.g}, ${midColor.b}), 
+      rgb(${highColor.r}, ${highColor.g}, ${highColor.b}))`
+  }
 }
 
 const isMaxValue = (row) => {
@@ -390,5 +481,142 @@ const exportCSV = () => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.table-row-enter-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.table-row-leave-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  width: 100%;
+}
+
+.table-row-enter-from {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.98);
+}
+
+.table-row-enter-to {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.table-row-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.table-row-leave-to {
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+}
+
+.table-row-move {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.heatmap-legend {
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.legend-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.legend-gradient {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.legend-gradient-bar {
+  width: 100%;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.legend-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.legend-indicators {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.legend-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.indicator-color {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .heatmap-legend {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .legend-label {
+    text-align: center;
+  }
+
+  .legend-gradient {
+    min-width: 100%;
+  }
+
+  .legend-indicators {
+    justify-content: center;
+  }
 }
 </style>

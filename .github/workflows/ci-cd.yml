@@ -64,6 +64,9 @@ jobs:
     - name: Build application
       run: npm run build
       
+    - name: Create CNAME file
+      run: echo "auxodata.com" > dist/CNAME
+      
     - name: Setup Pages
       uses: actions/configure-pages@v4
       

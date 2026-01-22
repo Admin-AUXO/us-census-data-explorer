@@ -266,7 +266,8 @@ export const useCensusStore = defineStore('census', () => {
 
   const loadManifest = async () => {
     try {
-      const response = await fetch('./data/manifest.json')
+      const baseUrl = import.meta.env.BASE_URL
+      const response = await fetch(`${baseUrl}data/manifest.json`)
       if (!response.ok) throw new Error('Failed to load manifest')
       manifest.value = await response.json()
       return manifest.value
@@ -289,8 +290,9 @@ export const useCensusStore = defineStore('census', () => {
     if (level === 'state') isLoading.value = true
 
     try {
+      const baseUrl = import.meta.env.BASE_URL
       const baseName = filename.replace('.csv', '')
-      const response = await fetch(`./data/${baseName}_${level}.csv`)
+      const response = await fetch(`${baseUrl}data/${baseName}_${level}.csv`)
 
       if (!response.ok) {
         throw new Error(`Failed to load ${level} data file`)

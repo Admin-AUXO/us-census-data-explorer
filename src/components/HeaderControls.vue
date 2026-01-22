@@ -219,8 +219,10 @@ const formatDatasetName = (filename) => {
 }
 
 const availableYears = computed(() => {
-  if (!store.data.state || store.data.state.length === 0) return []
-  const columns = Object.keys(store.data.state[0])
+  if (!store.data.state || !Array.isArray(store.data.state) || store.data.state.length === 0) return []
+  const firstRow = store.data.state[0]
+  if (!firstRow || typeof firstRow !== 'object' || firstRow === null) return []
+  const columns = Object.keys(firstRow)
   const yearMatches = columns
     .map(col => col.match(/_(\d{4})$/))
     .filter(match => match)
@@ -229,8 +231,10 @@ const availableYears = computed(() => {
 })
 
 const availableMetrics = computed(() => {
-  if (!store.data.state || !selectedYear.value) return []
-  const columns = Object.keys(store.data.state[0])
+  if (!store.data.state || !Array.isArray(store.data.state) || store.data.state.length === 0 || !selectedYear.value) return []
+  const firstRow = store.data.state[0]
+  if (!firstRow || typeof firstRow !== 'object' || firstRow === null) return []
+  const columns = Object.keys(firstRow)
   const metrics = columns
     .filter(col => col.endsWith(`_${selectedYear.value}`))
     .map(col => {
@@ -328,18 +332,20 @@ const onDatasetChange = async () => {
   try {
     await store.loadDataset(selectedDataset.value)
     store.currentDataset = selectedDataset.value
-    if (availableYears.value.length > 0) {
+    await nextTick()
+    if (availableYears.value && availableYears.value.length > 0) {
       selectedYear.value = availableYears.value[0]
-      onYearChange()
+      await onYearChange()
     }
   } catch (error) {
     console.error('Failed to load dataset:', error)
   }
 }
 
-const onYearChange = () => {
+const onYearChange = async () => {
   store.currentYear = selectedYear.value
-  if (availableMetrics.value.length > 0) {
+  await nextTick()
+  if (availableMetrics.value && availableMetrics.value.length > 0) {
     selectedMetric.value = availableMetrics.value[0].value
     onMetricChange()
   }
@@ -362,20 +368,20 @@ const handleCompareYearChange = (event) => {
   }
 }
 
-watch(() => store.manifest, (manifest) => {
+watch(() => store.manifest, async (manifest) => {
   if (manifest?.datasets && manifest.datasets.length > 0) {
     const prefs = store.loadPreferences()
-    if (prefs) {
+    if (prefs && prefs.dataset) {
       if (prefs.dataset) selectedDataset.value = prefs.dataset
       if (prefs.year) selectedYear.value = prefs.year
       if (prefs.metric) selectedMetric.value = prefs.metric
-      onDatasetChange()
+      await onDatasetChange()
       return
     }
     if (!selectedDataset.value && !store.currentDataset) {
       const firstDataset = manifest.datasets[0].source_file
       selectedDataset.value = firstDataset
-      onDatasetChange()
+      await onDatasetChange()
     }
   }
 }, { immediate: true })

@@ -163,7 +163,11 @@ const handleKeydown = (event) => {
 
 onMounted(async () => {
   document.addEventListener('keydown', handleKeydown)
-  await store.loadManifest()
+  try {
+    await store.loadManifest()
+  } catch (error) {
+    console.error('Failed to load manifest:', error)
+  }
 })
 
 onUnmounted(() => {

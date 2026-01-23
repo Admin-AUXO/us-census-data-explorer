@@ -2,7 +2,7 @@
   <header class="header">
     <div class="header-container">
       <div class="header-top">
-        <div class="header-top-row">
+        <div class="header-top-row header-brand-row">
           <div class="header-brand">
             <div class="brand-row">
               <AuxoLogo size="small" />
@@ -11,7 +11,7 @@
             </div>
           </div>
         </div>
-        <div class="header-top-row">
+        <div class="header-top-row header-nav-row-wrapper">
           <div class="header-nav-row">
             <button
               v-if="store.currentLevel !== 'state'"
@@ -53,6 +53,8 @@
               </button>
             </nav>
           </div>
+        </div>
+        <div class="header-top-row header-controls-row">
           <div class="header-controls">
             <button 
               class="btn-view-level"

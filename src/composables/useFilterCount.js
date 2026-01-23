@@ -15,8 +15,6 @@ export const useFilterCount = () => {
       f.selectedAiannh?.length > 0 ||
       f.selectedUrbanRural?.length > 0 ||
       f.selectedMetroAreas?.length > 0 ||
-      (f.populationMin != null && f.populationMin !== '') ||
-      (f.populationMax != null && f.populationMax !== '') ||
       (f.areaMin != null && f.areaMin !== '') ||
       (f.areaMax != null && f.areaMax !== '') ||
       (f.metricValueMin != null && f.metricValueMin !== '') ||
@@ -35,8 +33,6 @@ export const useFilterCount = () => {
     if (f.selectedAiannh?.length > 0) count++
     if (f.selectedUrbanRural?.length > 0) count++
     if (f.selectedMetroAreas?.length > 0) count++
-    if (f.populationMin != null && f.populationMin !== '') count++
-    if (f.populationMax != null && f.populationMax !== '') count++
     if (f.areaMin != null && f.areaMin !== '') count++
     if (f.areaMax != null && f.areaMax !== '') count++
     if (f.metricValueMin != null && f.metricValueMin !== '') count++

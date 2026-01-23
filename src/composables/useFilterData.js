@@ -41,26 +41,6 @@ export const useFilterData = () => {
       }
     }
 
-    const popCol = filtered[0]?.total_population_2024 || 
-                   filtered[0]?.total_population_2023 ||
-                   filtered[0]?.total_population_2022 ||
-                   Object.keys(filtered[0] || {}).find(k => k.includes('total_population'))
-
-    if (excludeFilter !== 'population') {
-      if (store.dimensionFilters.populationMin !== null && store.dimensionFilters.populationMin !== '' && popCol) {
-        filtered = filtered.filter(d => {
-          const pop = parseFloat(d[popCol]) || 0
-          return pop >= parseFloat(store.dimensionFilters.populationMin)
-        })
-      }
-      if (store.dimensionFilters.populationMax !== null && store.dimensionFilters.populationMax !== '' && popCol) {
-        filtered = filtered.filter(d => {
-          const pop = parseFloat(d[popCol]) || 0
-          return pop <= parseFloat(store.dimensionFilters.populationMax)
-        })
-      }
-    }
-
     if (excludeFilter !== 'area') {
       if (store.dimensionFilters.areaMin !== null && store.dimensionFilters.areaMin !== '') {
         filtered = filtered.filter(d => {

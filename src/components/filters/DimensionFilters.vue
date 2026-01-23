@@ -85,23 +85,6 @@
           </div>
           <div class="filter-group numeric-filters">
             <label class="filter-label">
-              <TrendingUp :size="16" />
-              <span>Population Range</span>
-            </label>
-            <div class="slider-container">
-              <div class="range-info">
-                <span class="range-label">Range: {{ populationRange.min.toLocaleString() }} - {{ populationRange.max.toLocaleString() }}</span>
-              </div>
-              <DoubleRangeSlider
-                v-model="populationRangeValue"
-                :min="populationRange.min"
-                :max="populationRange.max"
-                :step="populationRange.step"
-              />
-            </div>
-          </div>
-          <div class="filter-group numeric-filters">
-            <label class="filter-label">
               <MapPin :size="16" />
               <span>Area Range (km²)</span>
             </label>
@@ -196,23 +179,6 @@
           </div>
           <div class="filter-group numeric-filters">
             <label class="filter-label">
-              <TrendingUp :size="16" />
-              <span>Population Range</span>
-            </label>
-            <div class="slider-container">
-              <div class="range-info">
-                <span class="range-label">Range: {{ populationRange.min.toLocaleString() }} - {{ populationRange.max.toLocaleString() }}</span>
-              </div>
-              <DoubleRangeSlider
-                v-model="populationRangeValue"
-                :min="populationRange.min"
-                :max="populationRange.max"
-                :step="populationRange.step"
-              />
-            </div>
-          </div>
-          <div class="filter-group numeric-filters">
-            <label class="filter-label">
               <MapPin :size="16" />
               <span>Area Range (km²)</span>
             </label>
@@ -290,23 +256,6 @@
           </div>
           <div class="filter-group numeric-filters">
             <label class="filter-label">
-              <TrendingUp :size="16" />
-              <span>Population Range</span>
-            </label>
-            <div class="slider-container">
-              <div class="range-info">
-                <span class="range-label">Range: {{ populationRange.min.toLocaleString() }} - {{ populationRange.max.toLocaleString() }}</span>
-              </div>
-              <DoubleRangeSlider
-                v-model="populationRangeValue"
-                :min="populationRange.min"
-                :max="populationRange.max"
-                :step="populationRange.step"
-              />
-            </div>
-          </div>
-          <div class="filter-group numeric-filters">
-            <label class="filter-label">
               <MapPin :size="16" />
               <span>Area Range (km²)</span>
             </label>
@@ -350,7 +299,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useCensusStore } from '../../stores/census'
-import { Filter, MapPin, Globe, Building, Map, X, TrendingUp, Activity } from 'lucide-vue-next'
+import { Filter, MapPin, Globe, Building, Map, X, Activity } from 'lucide-vue-next'
 import { useFilterCount } from '../../composables/useFilterCount'
 import { useFilterData } from '../../composables/useFilterData'
 import { useAvailableFilters } from '../../composables/useAvailableFilters'
@@ -378,32 +327,6 @@ const {
   availableAiannh,
   availableCongressionalDistricts
 } = useAvailableFilters()
-
-const populationRange = computed(() => {
-  const filtered = getBaseFilteredData('population')
-  if (!filtered || filtered.length === 0) {
-    return { min: 0, max: 1000000, step: 1000 }
-  }
-  
-  const popCol = filtered[0]?.total_population_2024 || 
-                 filtered[0]?.total_population_2023 ||
-                 filtered[0]?.total_population_2022 ||
-                 Object.keys(filtered[0] || {}).find(k => k.includes('total_population'))
-  
-  if (!popCol) return { min: 0, max: 1000000, step: 1000 }
-  
-  const values = filtered
-    .map(row => parseFloat(row[popCol]) || 0)
-    .filter(v => v > 0)
-  
-  if (values.length === 0) return { min: 0, max: 1000000, step: 1000 }
-  
-  const min = Math.floor(Math.min(...values))
-  const max = Math.ceil(Math.max(...values))
-  const step = Math.max(1, Math.floor((max - min) / 1000))
-  
-  return { min, max, step }
-})
 
 const areaRange = computed(() => {
   const filtered = getBaseFilteredData('area')
@@ -445,17 +368,6 @@ const metricRange = computed(() => {
   return { min, max, step }
 })
 
-
-const populationRangeValue = computed({
-  get: () => ({
-    min: store.dimensionFilters.populationMin,
-    max: store.dimensionFilters.populationMax
-  }),
-  set: (val) => {
-    store.dimensionFilters.populationMin = val.min
-    store.dimensionFilters.populationMax = val.max
-  }
-})
 
 const areaRangeValue = computed({
   get: () => ({

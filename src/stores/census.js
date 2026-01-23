@@ -43,8 +43,6 @@ export const useCensusStore = defineStore('census', () => {
     selectedAiannh: [],
     selectedUrbanRural: [],
     selectedMetroAreas: [],
-    populationMin: null,
-    populationMax: null,
     areaMin: null,
     areaMax: null,
     metricValueMin: null,
@@ -99,8 +97,6 @@ export const useCensusStore = defineStore('census', () => {
       filters.selectedAiannh.length > 0 ||
       filters.selectedUrbanRural.length > 0 ||
       filters.selectedMetroAreas.length > 0 ||
-      filters.populationMin !== null ||
-      filters.populationMax !== null ||
       filters.areaMin !== null ||
       filters.areaMax !== null ||
       filters.metricValueMin !== null ||
@@ -584,8 +580,6 @@ export const useCensusStore = defineStore('census', () => {
       f.selectedUrbanRural = [...new Set(zcta5Data.map(d => d.urban_rural || 'N/A').filter(ur => ur && ur !== 'N/A'))]
       f.selectedMetroAreas = [...new Set(zcta5Data.map(d => d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)).filter(Boolean))]
     }
-    f.populationMin = null
-    f.populationMax = null
     f.areaMin = null
     f.areaMax = null
     f.metricValueMin = null
@@ -601,8 +595,6 @@ export const useCensusStore = defineStore('census', () => {
     dimensionFilters.selectedAiannh,
     dimensionFilters.selectedUrbanRural,
     dimensionFilters.selectedMetroAreas,
-    dimensionFilters.populationMin,
-    dimensionFilters.populationMax,
     dimensionFilters.areaMin,
     dimensionFilters.areaMax,
     dimensionFilters.metricValueMin,

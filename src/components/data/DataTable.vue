@@ -63,7 +63,7 @@
             <th v-if="store.currentLevel === 'county' || store.currentLevel === 'zcta5'" class="col-urban-rural">Urban/Rural</th>
             <th v-if="store.currentLevel === 'county' || store.currentLevel === 'zcta5'" class="col-metro">Metro Area</th>
             <th v-if="store.currentLevel === 'zcta5' && hasAiannh" class="col-aiannh">AIANNH</th>
-            <th v-if="store.currentLevel === 'zcta5'" class="col-area">Area (km²)</th>
+            <th class="col-area">Area (km²)</th>
             <th class="col-value">{{ metricLabel }}</th>
             <th v-if="hasComparison" class="col-change">YoY Change</th>
             <th v-if="store.currentLevel !== 'zcta5'" class="col-count">
@@ -99,7 +99,7 @@
             <td v-if="store.currentLevel === 'zcta5' && hasAiannh" class="col-aiannh">
               {{ row.aiannh_name || 'N/A' }}
             </td>
-            <td v-if="store.currentLevel === 'zcta5'" class="col-area">
+            <td class="col-area">
               {{ formatArea(row.land_area_sq_km) }}
             </td>
             <td class="value-col col-value" :style="getHeatStyle(row)">

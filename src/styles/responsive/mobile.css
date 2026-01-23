@@ -600,6 +600,8 @@
   .summary-panel {
     margin-bottom: 0.5rem !important;
     border-radius: var(--radius-md) !important;
+    position: relative !important;
+    z-index: var(--z-index-base) !important;
   }
 
   .summary-title h2 {

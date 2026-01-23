@@ -859,12 +859,31 @@
     overflow-x: auto !important;
     overflow-y: visible !important;
     -webkit-overflow-scrolling: touch !important;
+    scroll-behavior: smooth !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
     flex: 1 1 auto !important;
     min-height: 0 !important;
     position: relative !important;
+  }
+
+  .table-wrapper::-webkit-scrollbar {
+    height: 6px !important;
+  }
+
+  .table-wrapper::-webkit-scrollbar-track {
+    background: var(--bg-surface) !important;
+    border-radius: var(--radius-sm) !important;
+  }
+
+  .table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border-color) !important;
+    border-radius: var(--radius-sm) !important;
+  }
+
+  .table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-green-opacity-30) !important;
   }
 
   .data-table {

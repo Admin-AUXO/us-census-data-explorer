@@ -384,10 +384,12 @@
 <script setup>
 import { computed } from 'vue'
 import { useCensusStore } from '../../stores/census'
-import { Filter, MapPin, Globe, Building, Map, X, Activity } from 'lucide-vue-next'
+import { Filter, MapPin, Globe, Building, Map, X, Activity, Database, Calendar, TrendingUp, GitCompare } from 'lucide-vue-next'
 import { useFilterCount } from '../../composables/useFilterCount'
 import { useFilterData } from '../../composables/useFilterData'
 import { useAvailableFilters } from '../../composables/useAvailableFilters'
+import { useFilters } from '../../composables/useFilters'
+import { formatDatasetName } from '../../utils/formatUtils'
 import DoubleRangeSlider from './DoubleRangeSlider.vue'
 import MultiSelectList from './MultiSelectList.vue'
 

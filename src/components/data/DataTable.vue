@@ -370,6 +370,9 @@ const getChildCount = (row) => {
     }
     return count
   } else if (store.currentLevel === 'county') {
+    if (row.zcta5_count !== undefined && row.zcta5_count !== null) {
+      return row.zcta5_count
+    }
     const key = `county_${store.currentState}_${row.county_name}`
     if (childCountCache.value.has(key)) {
       return childCountCache.value.get(key)

@@ -306,16 +306,20 @@ export const useCensusStore = defineStore('census', () => {
       loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: `Loading ${levelNames[level]} data...` }
       
       const filePath = getDataPath(`data/${baseName}_${level}.csv`)
-      console.log(`[Census Store] Loading ${level} data from: ${filePath}`)
+      if (import.meta.env.DEV) {
+        console.log(`[Census Store] Loading ${level} data from: ${filePath}`)
+      }
       const response = await fetch(filePath)
 
       if (!response.ok) {
-        const errorMsg = `Failed to load ${level} data: ${response.status} ${response.statusText} from ${filePath}. Check if file exists and path is correct.`
+        const errorMsg = `Failed to load ${level} data: ${response.status} ${response.statusText} from ${filePath}. Expected file: public/data/${baseName}_${level}.csv`
         console.error(`[Census Store] ${errorMsg}`)
         throw new Error(errorMsg)
       }
       
-      console.log(`[Census Store] ${level} data file found, size: ${response.headers.get('content-length') || 'unknown'} bytes`)
+      if (import.meta.env.DEV) {
+        console.log(`[Census Store] ${level} data file found, size: ${response.headers.get('content-length') || 'unknown'} bytes`)
+      }
 
       const contentLength = response.headers.get('content-length')
       if (contentLength) {
@@ -325,15 +329,31 @@ export const useCensusStore = defineStore('census', () => {
       loadingProgress.value.stage = `Downloading ${levelNames[level]}...`
       const text = await response.text()
       
+      if (!text || text.trim().length === 0) {
+        throw new Error(`Empty file received from ${filePath}`)
+      }
+      
       loadingProgress.value.stage = `Processing ${levelNames[level]}...`
-      const levelData = await parseCSV(text, (progress) => {
-        loadingProgress.value = { ...progress, stage: progress.stage || `Processing ${levelNames[level]}...` }
-      })
+      let levelData
+      try {
+        levelData = await parseCSV(text, (progress) => {
+          loadingProgress.value = { ...progress, stage: progress.stage || `Processing ${levelNames[level]}...` }
+        })
+      } catch (parseError) {
+        console.error(`[Census Store] CSV parsing error for ${filePath}:`, parseError)
+        throw new Error(`Failed to parse CSV: ${parseError.message || parseError}`)
+      }
       
       loadingProgress.value.stage = `Finalizing ${levelNames[level]}...`
       
-      if (!levelData || !Array.isArray(levelData) || levelData.length === 0) {
-        const errorMsg = `No data loaded for ${level} level from ${filePath}. File may be empty or invalid.`
+      if (!levelData || !Array.isArray(levelData)) {
+        const errorMsg = `Invalid data format returned from ${filePath}. Expected array, got ${typeof levelData}`
+        console.error(`[Census Store] ${errorMsg}`, levelData)
+        throw new Error(errorMsg)
+      }
+      
+      if (levelData.length === 0) {
+        const errorMsg = `No data rows found in ${filePath}. File may be empty or contain only headers.`
         console.error(`[Census Store] ${errorMsg}`)
         throw new Error(errorMsg)
       }

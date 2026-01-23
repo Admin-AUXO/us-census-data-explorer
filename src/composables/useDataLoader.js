@@ -36,16 +36,30 @@ export const useDataLoader = () => {
       loadingProgress.value.stage = `Downloading ${levelNames[level]}...`
       const text = await response.text()
       
+      if (!text || text.trim().length === 0) {
+        throw new Error(`Empty file received from ${filePath}`)
+      }
+      
       loadingProgress.value.stage = `Processing ${levelNames[level]}...`
-      const levelData = await parseCSV(text, (progress) => {
-        loadingProgress.value = { ...progress, stage: progress.stage || `Processing ${levelNames[level]}...` }
-        if (onProgress) onProgress(progress)
-      })
+      let levelData
+      try {
+        levelData = await parseCSV(text, (progress) => {
+          loadingProgress.value = { ...progress, stage: progress.stage || `Processing ${levelNames[level]}...` }
+          if (onProgress) onProgress(progress)
+        })
+      } catch (parseError) {
+        console.error(`[DataLoader] CSV parsing error for ${filePath}:`, parseError)
+        throw new Error(`Failed to parse CSV: ${parseError.message || parseError}`)
+      }
       
       loadingProgress.value.stage = `Finalizing ${levelNames[level]}...`
       
-      if (!levelData?.length) {
-        throw new Error(`No data loaded for ${level} level from ${filePath}`)
+      if (!levelData || !Array.isArray(levelData)) {
+        throw new Error(`Invalid data format returned from ${filePath}. Expected array, got ${typeof levelData}`)
+      }
+      
+      if (levelData.length === 0) {
+        throw new Error(`No data rows found in ${filePath}. File may be empty or contain only headers.`)
       }
       
       if (import.meta.env.DEV) {

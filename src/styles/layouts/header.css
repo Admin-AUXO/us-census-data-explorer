@@ -124,6 +124,14 @@
   color: var(--accent-green);
 }
 
+.breadcrumb-sep {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  margin: 0 var(--spacing-xs);
+  display: flex;
+  align-items: center;
+}
+
 .header-filters-bar {
   padding: var(--spacing-md) var(--spacing-sm);
   border-top: var(--border-width-sm) solid var(--border-color);

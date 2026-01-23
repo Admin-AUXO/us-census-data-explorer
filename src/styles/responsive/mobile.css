@@ -344,6 +344,11 @@
 
   .sidebar-overlay {
     padding: 0 !important;
+    z-index: var(--z-index-sidebar-overlay) !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: var(--overlay-bg) !important;
+    backdrop-filter: blur(var(--blur-sm)) !important;
   }
 
   .sidebar-panel {
@@ -355,6 +360,9 @@
     border-radius: 0 !important;
     display: flex !important;
     flex-direction: column !important;
+    z-index: var(--z-index-sidebar-panel) !important;
+    position: relative !important;
+    overflow: hidden !important;
   }
 
   .sidebar-header {
@@ -380,7 +388,8 @@
 
   .sidebar-content {
     padding: 0.75rem !important;
-    height: calc(100vh - 80px) !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     width: 100% !important;
@@ -887,6 +896,51 @@
     letter-spacing: 0.3px !important;
   }
 
+  .data-table th.col-abbr {
+    min-width: 40px !important;
+    max-width: 50px !important;
+  }
+
+  .data-table th.col-region {
+    min-width: 70px !important;
+    max-width: 90px !important;
+  }
+
+  .data-table th.col-urban-rural {
+    min-width: 60px !important;
+    max-width: 80px !important;
+  }
+
+  .data-table th.col-metro {
+    min-width: 100px !important;
+    max-width: 140px !important;
+  }
+
+  .data-table th.col-aiannh {
+    min-width: 100px !important;
+    max-width: 140px !important;
+  }
+
+  .data-table th.col-area {
+    min-width: 70px !important;
+    max-width: 90px !important;
+  }
+
+  .data-table th.col-value {
+    min-width: 80px !important;
+    max-width: 100px !important;
+  }
+
+  .data-table th.col-change {
+    min-width: 65px !important;
+    max-width: 80px !important;
+  }
+
+  .data-table th.col-count {
+    min-width: 55px !important;
+    max-width: 70px !important;
+  }
+
   .data-table th.col-state {
     min-width: 80px !important;
     max-width: 100px !important;
@@ -908,6 +962,64 @@
 
   .data-table td:not(.col-state):not(.primary-col) {
     white-space: nowrap !important;
+  }
+
+  .data-table td.col-abbr {
+    min-width: 40px !important;
+    max-width: 50px !important;
+    text-align: center !important;
+  }
+
+  .data-table td.col-region {
+    min-width: 70px !important;
+    max-width: 90px !important;
+    text-align: center !important;
+  }
+
+  .data-table td.col-urban-rural {
+    min-width: 60px !important;
+    max-width: 80px !important;
+    text-align: center !important;
+  }
+
+  .data-table td.col-metro {
+    min-width: 100px !important;
+    max-width: 140px !important;
+    text-align: left !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .data-table td.col-aiannh {
+    min-width: 100px !important;
+    max-width: 140px !important;
+    text-align: left !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .data-table td.col-area {
+    min-width: 70px !important;
+    max-width: 90px !important;
+    text-align: right !important;
+  }
+
+  .data-table td.col-value {
+    min-width: 80px !important;
+    max-width: 100px !important;
+    text-align: right !important;
+  }
+
+  .data-table td.col-change {
+    min-width: 65px !important;
+    max-width: 80px !important;
+    text-align: center !important;
+  }
+
+  .data-table td.col-count {
+    min-width: 55px !important;
+    max-width: 70px !important;
+    text-align: center !important;
   }
 
   .data-table td.col-state,

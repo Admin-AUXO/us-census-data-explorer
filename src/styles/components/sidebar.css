@@ -14,6 +14,31 @@
   pointer-events: auto;
 }
 
+.sidebar-enter-active,
+.sidebar-leave-active {
+  transition: opacity var(--duration-standard) var(--easing-standard);
+}
+
+.sidebar-enter-active .sidebar-panel,
+.sidebar-leave-active .sidebar-panel {
+  transition: transform var(--duration-standard) var(--easing-standard);
+}
+
+.sidebar-enter-from,
+.sidebar-leave-to {
+  opacity: 0;
+}
+
+.sidebar-enter-from .sidebar-panel,
+.sidebar-leave-to .sidebar-panel {
+  transform: translateX(100%);
+}
+
+.sidebar-enter-to .sidebar-panel,
+.sidebar-leave-from .sidebar-panel {
+  transform: translateX(0);
+}
+
 .sidebar-panel {
   width: var(--size-sidebar-width);
   max-width: 90vw;

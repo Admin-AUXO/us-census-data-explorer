@@ -22,8 +22,10 @@
     padding: 0 var(--spacing-md);
   }
 
-  .header-top,
-  .header-nav,
+  .header-top {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
   .header-filters-bar {
     padding-left: var(--spacing-md);
     padding-right: var(--spacing-md);
@@ -39,8 +41,10 @@
     padding: 0 var(--spacing-lg);
   }
 
-  .header-top,
-  .header-nav,
+  .header-top {
+    padding: var(--spacing-sm) var(--spacing-lg);
+  }
+
   .header-filters-bar {
     padding-left: var(--spacing-lg);
     padding-right: var(--spacing-lg);

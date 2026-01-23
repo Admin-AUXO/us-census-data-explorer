@@ -15,19 +15,24 @@
 }
 
 .header-top {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-sm) clamp(var(--spacing-md), 4vw, var(--spacing-3xl));
+  padding: var(--spacing-sm);
   gap: var(--spacing-md);
   border-bottom: var(--border-width-sm) solid var(--border-color);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .header-brand {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .brand-row {
@@ -35,6 +40,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .header-brand > :deep(.auxo-logo-container) {
@@ -58,14 +64,25 @@
   padding: 0;
   white-space: nowrap;
   letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .header-breadcrumbs {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  margin-left: var(--spacing-sm);
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.header-breadcrumbs::-webkit-scrollbar {
+  display: none;
 }
 
 .header-controls {
@@ -73,6 +90,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   flex-shrink: 0;
+  justify-content: flex-end;
 }
 
 .btn-back {
@@ -90,6 +108,7 @@
   transition: all var(--duration-fast) var(--easing-standard);
   white-space: nowrap;
   height: 1.75rem;
+  flex-shrink: 0;
 }
 
 .btn-back:hover {
@@ -102,7 +121,8 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: min-content;
 }
 
 .breadcrumb-link {
@@ -120,6 +140,7 @@
   transition: all var(--duration-fast) var(--easing-standard);
   white-space: nowrap;
   height: 1.75rem;
+  flex-shrink: 0;
 }
 
 .breadcrumb-link:hover:not(:disabled) {

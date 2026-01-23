@@ -42,21 +42,6 @@
   overflow: hidden;
 }
 
-.header-nav-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.header-nav-row::-webkit-scrollbar {
-  display: none;
-}
 
 .brand-row {
   display: flex;
@@ -101,41 +86,21 @@
   justify-content: flex-end;
 }
 
-.btn-back {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background: var(--accent-green);
-  color: var(--text-on-accent);
-  border: none;
-  border-radius: var(--radius-sm);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-xs);
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--easing-standard);
-  white-space: nowrap;
-  height: 1.75rem;
-  flex-shrink: 0;
-}
-
-.btn-back:hover {
-  background: var(--accent-green-opacity-85);
-  transform: translateX(-2px);
-  box-shadow: var(--shadow-sm);
-}
 
 .breadcrumb-nav {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--spacing-sm);
   flex-wrap: nowrap;
-  min-width: min-content;
+  width: 100%;
+  min-width: 0;
 }
 
 .breadcrumb-link {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-sm);
   background: var(--bg-elevated);
@@ -148,7 +113,9 @@
   transition: all var(--duration-fast) var(--easing-standard);
   white-space: nowrap;
   height: 1.75rem;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .breadcrumb-link:hover:not(:disabled) {

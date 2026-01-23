@@ -39,7 +39,6 @@
             <h3>Keyboard Shortcuts</h3>
             <ul>
               <li><strong>Esc:</strong> Close panels or reset view</li>
-              <li><strong>Ctrl/Cmd + Backspace:</strong> Go back one level</li>
               <li><strong>? or Shift + /:</strong> Toggle help</li>
             </ul>
           </div>

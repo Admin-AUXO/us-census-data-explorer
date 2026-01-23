@@ -162,9 +162,6 @@ const handleKeydown = (event) => {
   } else if (event.key === '?' || (event.key === '/' && event.shiftKey)) {
     event.preventDefault()
     showHelp.value = !showHelp.value
-  } else if (event.key === 'Backspace' && (event.ctrlKey || event.metaKey)) {
-    event.preventDefault()
-    store.goBack()
   }
 }
 

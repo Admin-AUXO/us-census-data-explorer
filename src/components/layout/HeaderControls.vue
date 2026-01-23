@@ -12,47 +12,36 @@
           </div>
         </div>
         <div class="header-top-row header-nav-row-wrapper">
-          <div class="header-nav-row">
+          <nav class="breadcrumb-nav">
             <button
-              v-if="store.currentLevel !== 'state'"
-              class="btn-back"
-              @click="store.goBack()"
-              aria-label="Go back"
+              class="breadcrumb-link"
+              :class="{ 'active': store.currentLevel === 'state' }"
+              @click="store.reset()"
             >
-              <ChevronLeft :size="14" />
-              <span>Back</span>
+              <Globe :size="12" />
+              <span>United States</span>
             </button>
-            <nav class="breadcrumb-nav">
-              <button
-                class="breadcrumb-link"
-                :class="{ 'active': store.currentLevel === 'state' }"
-                @click="store.reset()"
-              >
-                <Globe :size="12" />
-                <span>United States</span>
-              </button>
-              <ChevronRight v-if="store.currentState" :size="10" class="breadcrumb-sep" />
-              <button
-                v-if="store.currentState"
-                class="breadcrumb-link"
-                :class="{ 'active': store.currentLevel === 'county' }"
-                @click="navigateToState"
-              >
-                <MapPin :size="12" />
-                <span>{{ store.currentState }}</span>
-              </button>
-              <ChevronRight v-if="store.currentCounty" :size="10" class="breadcrumb-sep" />
-              <button
-                v-if="store.currentCounty"
-                class="breadcrumb-link"
-                :class="{ 'active': store.currentLevel === 'zcta5' }"
-                disabled
-              >
-                <Building :size="12" />
-                <span>{{ store.currentCounty }}</span>
-              </button>
-            </nav>
-          </div>
+            <ChevronRight v-if="store.currentState" :size="10" class="breadcrumb-sep" />
+            <button
+              v-if="store.currentState"
+              class="breadcrumb-link"
+              :class="{ 'active': store.currentLevel === 'county' }"
+              @click="navigateToState"
+            >
+              <MapPin :size="12" />
+              <span>{{ store.currentState }}</span>
+            </button>
+            <ChevronRight v-if="store.currentCounty" :size="10" class="breadcrumb-sep" />
+            <button
+              v-if="store.currentCounty"
+              class="breadcrumb-link"
+              :class="{ 'active': store.currentLevel === 'zcta5' }"
+              disabled
+            >
+              <Building :size="12" />
+              <span>{{ store.currentCounty }}</span>
+            </button>
+          </nav>
         </div>
         <div class="header-top-row header-controls-row">
           <div class="header-controls">
@@ -210,7 +199,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useCensusStore } from '../../stores/census'
-import { Database, Calendar, TrendingUp, GitCompare, Search, X, HelpCircle, ChevronLeft, ChevronRight, Globe, MapPin, Building, Filter } from 'lucide-vue-next'
+import { Database, Calendar, TrendingUp, GitCompare, Search, X, HelpCircle, ChevronRight, Globe, MapPin, Building, Filter } from 'lucide-vue-next'
 import AuxoLogo from '../../components/common/AuxoLogo.vue'
 import { formatDatasetName } from '../../utils/formatUtils'
 import { useFilters } from '../../composables/useFilters'

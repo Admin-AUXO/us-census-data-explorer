@@ -82,6 +82,7 @@
   .header-nav-row-wrapper {
     gap: 0 !important;
     padding: 0.25rem 0 !important;
+    width: 100% !important;
   }
 
   .header-controls-row {
@@ -210,13 +211,13 @@
     align-items: center !important;
     flex-shrink: 0 !important;
     color: var(--text-tertiary) !important;
-    margin: 0 !important;
+    margin: 0 0.125rem !important;
     padding: 0 !important;
   }
 
   .breadcrumb-sep svg {
-    width: 10px !important;
-    height: 10px !important;
+    width: 8px !important;
+    height: 8px !important;
     flex-shrink: 0 !important;
   }
 
@@ -1024,18 +1025,6 @@
       font-size: 0.8125rem !important;
       max-width: 100% !important;
       width: 100% !important;
-    }
-
-    .btn-back {
-      font-size: 0.6875rem !important;
-      padding: 0.3125rem 0.5rem !important;
-      height: 1.5rem !important;
-      min-height: 1.5rem !important;
-    }
-
-    .btn-back svg {
-      width: 12px !important;
-      height: 12px !important;
     }
 
     .breadcrumb-link {

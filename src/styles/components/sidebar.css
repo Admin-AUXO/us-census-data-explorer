@@ -408,3 +408,9 @@
 .btn-reset-filters:active {
   transform: translateY(0);
 }
+
+@media (width >= 769px) {
+  .filter-section-primary {
+    display: none !important;
+  }
+}

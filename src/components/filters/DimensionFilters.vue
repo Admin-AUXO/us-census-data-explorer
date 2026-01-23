@@ -22,6 +22,91 @@
                 <span class="filter-count-badge">{{ activeFilterCount }}</span>
               </button>
             </div>
+            <div class="filter-section filter-section-primary">
+              <div class="filter-group">
+                <label class="filter-label">
+                  <Database :size="16" />
+                  <span>Dataset</span>
+                </label>
+                <select
+                  v-model="selectedDataset"
+                  @change="onDatasetChange"
+                  class="filter-select"
+                >
+                  <option value="">Select dataset...</option>
+                  <option
+                    v-for="dataset in store.manifest?.datasets"
+                    :key="dataset.source_file"
+                    :value="dataset.source_file"
+                  >
+                    {{ formatDatasetName(dataset.source_file) }}
+                  </option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label class="filter-label">
+                  <Calendar :size="16" />
+                  <span>Year</span>
+                </label>
+                <select
+                  v-model="selectedYear"
+                  @change="onYearChange"
+                  :disabled="!selectedDataset"
+                  class="filter-select"
+                >
+                  <option value="">Select year...</option>
+                  <option
+                    v-for="year in availableYears"
+                    :key="year"
+                    :value="year"
+                  >
+                    {{ year }}
+                  </option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label class="filter-label">
+                  <TrendingUp :size="16" />
+                  <span>Metric</span>
+                </label>
+                <select
+                  v-model="selectedMetric"
+                  @change="onMetricChange"
+                  :disabled="!selectedYear"
+                  class="filter-select"
+                >
+                  <option value="">Select metric...</option>
+                  <option
+                    v-for="metric in availableMetrics"
+                    :key="metric.value"
+                    :value="metric.value"
+                  >
+                    {{ metric.label }}
+                  </option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label class="filter-label">
+                  <GitCompare :size="16" />
+                  <span>Compare</span>
+                </label>
+                <select
+                  v-model="selectedCompareYear"
+                  @change="handleCompareYearChange"
+                  :disabled="!selectedMetric"
+                  class="filter-select"
+                >
+                  <option value="">None</option>
+                  <option
+                    v-for="year in compareYears"
+                    :key="year"
+                    :value="year"
+                  >
+                    {{ year }}
+                  </option>
+                </select>
+              </div>
+            </div>
         <div v-if="store.currentLevel === 'state'" class="filter-section">
           <div class="filter-group">
             <label class="filter-label">
@@ -318,6 +403,19 @@ defineEmits(['close'])
 const store = useCensusStore()
 const { hasActiveFilters, activeFilterCount } = useFilterCount()
 const { getBaseFilteredData } = useFilterData()
+const {
+  selectedDataset,
+  selectedYear,
+  selectedMetric,
+  selectedCompareYear,
+  availableYears,
+  availableMetrics,
+  compareYears,
+  onDatasetChange,
+  onYearChange,
+  onMetricChange,
+  handleCompareYearChange
+} = useFilters()
 const {
   availableRegions,
   availableStates,

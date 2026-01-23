@@ -10,7 +10,8 @@
     --component-height-md: 2.5rem;
     --component-height-lg: 3rem;
     --component-height-xl: 3.5rem;
-    --header-height-mobile: 120px;
+    --header-height-mobile: 130px;
+    --table-header-height-mobile: 80px;
   }
 
   html, body {
@@ -526,7 +527,11 @@
     padding: 1rem 0 0.75rem !important;
     margin-top: auto !important;
     width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    z-index: 1 !important;
   }
 
   .footer-container {
@@ -632,6 +637,7 @@
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
+    min-height: 0 !important;
   }
 
   .summary-title h2 {
@@ -830,12 +836,13 @@
 
   .main-content {
     padding: 0 !important;
-    padding-top: calc(var(--header-height-mobile, 120px)) !important;
+    padding-top: calc(var(--header-height-mobile, 130px)) !important;
     width: 100% !important;
     max-width: 100% !important;
-    min-height: calc(100vh - var(--header-height-mobile, 120px)) !important;
+    min-height: calc(100vh - var(--header-height-mobile, 130px)) !important;
     display: flex !important;
     flex-direction: column !important;
+    position: relative !important;
   }
 
   .main-content.with-sidebar {
@@ -847,10 +854,12 @@
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    flex: 1 !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 0.5rem !important;
+    min-height: 0 !important;
+    overflow: visible !important;
   }
 
   .data-container {
@@ -859,20 +868,24 @@
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    flex: 1 !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: visible !important;
   }
 
   .table-wrapper {
     padding: 0.375rem !important;
     overflow-x: auto !important;
+    overflow-y: visible !important;
     -webkit-overflow-scrolling: touch !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    flex: 1 !important;
+    flex: 1 1 auto !important;
     min-height: 0 !important;
+    position: relative !important;
   }
 
   .data-table {
@@ -886,7 +899,7 @@
 
   .data-table thead {
     position: sticky !important;
-    top: calc(var(--header-height-mobile, 120px) + 80px) !important;
+    top: calc(var(--header-height-mobile, 130px) + var(--table-header-height-mobile, 80px)) !important;
     z-index: 10 !important;
     background: var(--bg-elevated) !important;
   }
@@ -953,18 +966,17 @@
   .table-header {
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 0.75rem !important;
-    margin-bottom: 0.75rem !important;
-    padding-bottom: 0.5rem !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+    padding: 0.5rem 0.75rem !important;
     width: 100% !important;
     position: sticky !important;
-    top: calc(var(--header-height-mobile, 120px)) !important;
+    top: calc(var(--header-height-mobile, 130px)) !important;
     z-index: 9 !important;
     background: var(--bg-card) !important;
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.5rem !important;
-    margin-bottom: 0.5rem !important;
     border-bottom: var(--border-width-sm) solid var(--border-color) !important;
+    box-sizing: border-box !important;
+    min-height: 0 !important;
   }
 
   .table-header h2 {

@@ -942,8 +942,8 @@
   }
 
   .data-table th.col-urban-rural {
-    min-width: 60px !important;
-    max-width: 80px !important;
+    min-width: 85px !important;
+    max-width: 110px !important;
   }
 
   .data-table th.col-metro {
@@ -975,8 +975,8 @@
   }
 
   .data-table th.col-count {
-    min-width: 55px !important;
-    max-width: 70px !important;
+    min-width: 80px !important;
+    max-width: 100px !important;
   }
 
   .data-table th.col-state {
@@ -1088,8 +1088,8 @@
   }
 
   .data-table td.col-count {
-    min-width: 55px !important;
-    max-width: 70px !important;
+    min-width: 80px !important;
+    max-width: 100px !important;
     text-align: center !important;
   }
 

@@ -2,13 +2,17 @@
   <header class="header">
     <div class="header-container">
       <div class="header-top">
-        <div class="header-brand">
-          <div class="brand-row">
-            <AuxoLogo size="small" />
-            <div class="brand-separator"></div>
-            <h1 class="app-title">USA Census Data Explorer</h1>
+        <div class="header-top-row">
+          <div class="header-brand">
+            <div class="brand-row">
+              <AuxoLogo size="small" />
+              <div class="brand-separator"></div>
+              <h1 class="app-title">USA Census Data Explorer</h1>
+            </div>
           </div>
-          <div class="header-breadcrumbs">
+        </div>
+        <div class="header-top-row">
+          <div class="header-nav-row">
             <button
               v-if="store.currentLevel !== 'state'"
               class="btn-back"
@@ -49,33 +53,33 @@
               </button>
             </nav>
           </div>
-        </div>
-        <div class="header-controls">
-          <button 
-            class="btn-view-level"
-            :title="`Current view: ${levelName}`"
-          >
-            <component :is="levelIcon" :size="18" />
-            <span class="view-label">{{ levelName }}</span>
-          </button>
-          <button 
-            class="btn-filters" 
-            @click="$emit('toggle-filters')" 
-            :class="{ 'active': hasActiveFilters }"
-            :title="hasActiveFilters ? `${activeFilterCount} active filters` : 'Toggle filters'"
-          >
-            <Filter :size="18" />
-            <span>Filters</span>
-            <span v-if="hasActiveFilters" class="badge">{{ activeFilterCount }}</span>
-          </button>
-          <button 
-            class="btn-help" 
-            @click="$emit('show-help')"
-            title="Show help"
-          >
-            <HelpCircle :size="18" />
-            <span>Help</span>
-          </button>
+          <div class="header-controls">
+            <button 
+              class="btn-view-level"
+              :title="`Current view: ${levelName}`"
+            >
+              <component :is="levelIcon" :size="18" />
+              <span class="view-label">{{ levelName }}</span>
+            </button>
+            <button 
+              class="btn-filters" 
+              @click="$emit('toggle-filters')" 
+              :class="{ 'active': hasActiveFilters }"
+              :title="hasActiveFilters ? `${activeFilterCount} active filters` : 'Toggle filters'"
+            >
+              <Filter :size="18" />
+              <span>Filters</span>
+              <span v-if="hasActiveFilters" class="badge">{{ activeFilterCount }}</span>
+            </button>
+            <button 
+              class="btn-help" 
+              @click="$emit('show-help')"
+              title="Show help"
+            >
+              <HelpCircle :size="18" />
+              <span>Help</span>
+            </button>
+          </div>
         </div>
       </div>
 

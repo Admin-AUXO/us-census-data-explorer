@@ -605,7 +605,7 @@ const trendInfo = computed(() => {
 
 .summary-title h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--text-primary);
 }

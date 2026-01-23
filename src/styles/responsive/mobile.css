@@ -268,11 +268,27 @@
   .slider-container {
     padding: 0.5rem !important;
     touch-action: none !important;
+    overflow: hidden !important;
+    scrollbar-width: none !important;
+  }
+
+  .slider-container::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
   .slider {
     height: 44px !important;
     cursor: pointer !important;
+    overflow: hidden !important;
+    scrollbar-width: none !important;
+  }
+
+  .slider::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
   .slider::-webkit-slider-thumb {
@@ -285,6 +301,52 @@
     width: 28px !important;
     height: 28px !important;
     cursor: pointer !important;
+  }
+
+  .double-range-slider {
+    overflow: visible !important;
+    scrollbar-width: none !important;
+  }
+
+  .double-range-slider::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .slider-track-wrapper {
+    overflow: visible !important;
+    scrollbar-width: none !important;
+    padding: 10px 0 !important;
+  }
+
+  .slider-track-wrapper::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .slider-input {
+    overflow: visible !important;
+    scrollbar-width: none !important;
+    top: 10px !important;
+    touch-action: none !important;
+  }
+
+  .slider-input::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .slider-input::-webkit-slider-thumb {
+    pointer-events: all !important;
+    touch-action: none !important;
+  }
+
+  .slider-input::-moz-range-thumb {
+    pointer-events: all !important;
+    touch-action: none !important;
   }
 
   .btn-reset-filters {

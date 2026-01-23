@@ -10,7 +10,7 @@
         :value="minValue"
         @input="handleMinInput"
         class="slider-input slider-min"
-        :style="{ zIndex: minValue > maxValue ? 2 : 1 }"
+        :style="{ zIndex: minValue >= maxValue ? 3 : 1 }"
       />
       <input
         type="range"
@@ -20,7 +20,7 @@
         :value="maxValue"
         @input="handleMaxInput"
         class="slider-input slider-max"
-        :style="{ zIndex: minValue > maxValue ? 1 : 2 }"
+        :style="{ zIndex: minValue >= maxValue ? 2 : 3 }"
       />
     </div>
     <div class="slider-values">
@@ -102,7 +102,10 @@ const trackStyle = computed(() => {
 
 const handleMinInput = (e) => {
   const value = parseFloat(e.target.value)
-  const newMin = Math.min(value, maxValue.value)
+  let newMin = value
+  if (newMin >= maxValue.value) {
+    newMin = Math.max(props.min, maxValue.value - props.step)
+  }
   minValue.value = newMin
   emit('update:modelValue', { 
     min: newMin === props.min ? null : newMin, 
@@ -112,7 +115,10 @@ const handleMinInput = (e) => {
 
 const handleMaxInput = (e) => {
   const value = parseFloat(e.target.value)
-  const newMax = Math.max(value, minValue.value)
+  let newMax = value
+  if (newMax <= minValue.value) {
+    newMax = Math.min(props.max, minValue.value + props.step)
+  }
   maxValue.value = newMax
   emit('update:modelValue', { 
     min: props.modelValue.min ?? null, 
@@ -168,11 +174,20 @@ const clear = () => {
   position: relative;
   height: var(--size-slider-track);
   margin: 1.5rem 0;
+  padding: 10px 0;
+  overflow: visible !important;
+  scrollbar-width: none !important;
+}
+
+.slider-track-wrapper::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .slider-track {
   position: absolute;
-  top: 0;
+  top: 10px;
   height: var(--size-slider-track);
   background: var(--accent-green);
   border-radius: var(--radius-sm);
@@ -182,15 +197,25 @@ const clear = () => {
 
 .slider-input {
   position: absolute;
-  top: 0;
+  top: 10px;
   left: 0;
   width: 100%;
   height: var(--size-slider-track);
   margin: 0;
+  padding: 0;
   background: transparent;
   -webkit-appearance: none;
   appearance: none;
   pointer-events: none;
+  overflow: visible !important;
+  scrollbar-width: none !important;
+  touch-action: none !important;
+}
+
+.slider-input::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .slider-input::-webkit-slider-thumb {
@@ -204,8 +229,9 @@ const clear = () => {
   border: var(--size-thumb-border) solid var(--bg-card);
   box-shadow: var(--shadow-sm), 0 0 0 var(--size-thumb-border) var(--accent-green-opacity-20);
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: all;
+  pointer-events: all !important;
   position: relative;
+  touch-action: none !important;
 }
 
 .slider-input::-webkit-slider-thumb:hover {
@@ -227,7 +253,8 @@ const clear = () => {
   border: var(--size-thumb-border) solid var(--bg-card);
   box-shadow: var(--shadow-sm), 0 0 0 var(--size-thumb-border) var(--accent-green-opacity-20);
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: all;
+  pointer-events: all !important;
+  touch-action: none !important;
 }
 
 .slider-input::-moz-range-thumb:hover {

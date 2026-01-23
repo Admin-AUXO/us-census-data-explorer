@@ -284,6 +284,14 @@
   width: 100%;
   box-sizing: border-box;
   touch-action: none;
+  overflow: hidden !important;
+  scrollbar-width: none !important;
+}
+
+.slider-container::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .range-info {
@@ -309,6 +317,14 @@
   outline: none;
   -webkit-appearance: none;
   appearance: none;
+  overflow: hidden !important;
+  scrollbar-width: none !important;
+}
+
+.slider::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .slider::-webkit-slider-thumb {

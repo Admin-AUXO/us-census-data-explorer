@@ -228,31 +228,23 @@ onUnmounted(() => {
   padding: 2rem 2.5rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  animation: scaleIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 280px;
-  max-width: 400px;
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-8px) translateZ(0);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0) translateZ(0);
-  }
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(163, 230, 53, 0.1);
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  min-width: 300px;
+  max-width: 420px;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .loader-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--border-color);
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--bg-elevated);
   border-top-color: var(--accent-green);
   border-radius: 50%;
-  animation: spin 0.7s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  box-shadow: 0 0 20px rgba(163, 230, 53, 0.2);
 }
 
 .loader-content {
@@ -289,19 +281,33 @@ onUnmounted(() => {
 
 .progress-bar {
   width: 100%;
-  height: 6px;
+  height: 8px;
   background: var(--bg-elevated);
   border-radius: var(--radius-full);
   overflow: hidden;
   position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-green), rgba(163, 230, 53, 0.8));
+  background: linear-gradient(90deg, var(--accent-green), rgba(163, 230, 53, 0.85));
   border-radius: var(--radius-full);
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 8px rgba(163, 230, 53, 0.4);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(163, 230, 53, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
 }
 
 .progress-text {
@@ -316,25 +322,6 @@ onUnmounted(() => {
 .progress-percentage {
   font-weight: 600;
   color: var(--accent-green);
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.fade-enter-active {
-  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fade-leave-active {
-  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 
 .container {
@@ -371,15 +358,6 @@ onUnmounted(() => {
 .empty-state-icon {
   color: var(--text-tertiary);
   animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
 }
 
 .empty-state h3 {

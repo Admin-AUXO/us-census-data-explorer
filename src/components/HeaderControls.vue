@@ -77,7 +77,16 @@
         </div>
       </div>
 
-      <div class="header-filters-bar">
+      <button
+        class="filter-toggle-mobile"
+        @click="filtersExpanded = !filtersExpanded"
+        :class="{ 'active': filtersExpanded }"
+      >
+        <component :is="filtersExpanded ? ChevronUp : ChevronDown" :size="18" />
+        <span>{{ filtersExpanded ? 'Hide' : 'Show' }} Filters</span>
+      </button>
+
+      <div class="header-filters-bar" :class="{ 'collapsed': !filtersExpanded }">
         <div class="filter-controls">
           <div class="filter-item">
             <label for="dataset-select">
@@ -202,7 +211,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useCensusStore } from '../stores/census'
-import { Database, Calendar, TrendingUp, GitCompare, Search, X, HelpCircle, ChevronLeft, ChevronRight, Globe, MapPin, Building, Map, Layers, Filter } from 'lucide-vue-next'
+import { Database, Calendar, TrendingUp, GitCompare, Search, X, HelpCircle, ChevronLeft, ChevronRight, Globe, MapPin, Building, Map, Layers, Filter, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import AuxoLogo from './AuxoLogo.vue'
 
 const store = useCensusStore()
@@ -210,6 +219,7 @@ const selectedDataset = ref('')
 const selectedYear = ref('')
 const selectedMetric = ref('')
 const selectedCompareYear = ref('')
+const filtersExpanded = ref(true)
 
 const formatDatasetName = (filename) => {
   return filename
@@ -725,20 +735,60 @@ watch(() => selectedYear.value, () => {
 }
 
 .loading-indicator {
-  height: 2px;
+  height: 3px;
   background: var(--bg-secondary);
   overflow: hidden;
+  position: relative;
 }
 
 .loading-bar {
   height: 100%;
-  background: var(--accent-green);
-  animation: loading 1.5s ease-in-out infinite;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+  animation: shimmer 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(163, 230, 53, 0.5);
 }
 
-@keyframes loading {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+.filter-toggle-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .filter-toggle-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: calc(100% - 1.5rem);
+    margin: 0 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--easing-standard);
+    min-height: 44px;
+  }
+
+  .filter-toggle-mobile:active {
+    transform: scale(0.98);
+  }
+
+  .filter-toggle-mobile.active {
+    background: var(--accent-green-opacity-10);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+  }
+
+  .header-filters-bar.collapsed {
+    max-height: 0;
+    padding: 0;
+    overflow: hidden;
+    border-top: none;
+  }
 }
 
 @media (max-width: 1024px) {

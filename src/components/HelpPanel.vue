@@ -266,26 +266,6 @@ defineEmits(['close'])
   font-weight: var(--font-weight-semibold) !important;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0 !important;
-  }
-  to {
-    opacity: 1 !important;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0 !important;
-    transform: translateY(var(--spacing-lg)) !important;
-  }
-  to {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-  }
-}
-
 @media (max-width: 768px) {
   .help-content {
     max-width: 100% !important;

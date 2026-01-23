@@ -23,7 +23,6 @@
         </div>
 
         <div v-else class="summary-grid">
-          <!-- Geographic Context -->
           <div class="summary-card card-primary">
             <div class="card-header">
               <MapPin :size="20" />
@@ -57,7 +56,6 @@
             </div>
           </div>
 
-          <!-- Statistical Overview -->
           <div class="summary-card card-secondary">
             <div class="card-header">
               <Activity :size="20" />
@@ -91,7 +89,6 @@
             </div>
           </div>
 
-          <!-- Trend Analysis -->
           <div class="summary-card card-trend">
             <div class="card-header">
               <TrendingUp :size="20" />
@@ -139,7 +136,6 @@
             </div>
           </div>
 
-          <!-- Aggregates -->
           <div class="summary-card card-accent">
             <div class="card-header">
               <Activity :size="20" />
@@ -173,7 +169,6 @@
             </div>
           </div>
 
-          <!-- Top & Bottom Performers -->
           <div class="summary-card card-full">
             <div class="card-header">
               <Award :size="20" />

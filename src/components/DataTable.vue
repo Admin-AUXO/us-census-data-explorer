@@ -440,7 +440,6 @@ const exportCSV = () => {
 }
 
 .table-container.filtering {
-  opacity: 0.7;
   pointer-events: none;
 }
 
@@ -450,13 +449,14 @@ const exportCSV = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--overlay-bg-light);
-  backdrop-filter: blur(var(--blur-sm));
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: var(--z-index-overlay);
   border-radius: var(--radius-md);
+  animation: fadeIn 0.2s var(--easing-standard);
 }
 
 .filtering-loader {
@@ -464,15 +464,15 @@ const exportCSV = () => {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 1.5rem 2rem;
+  padding: 1.75rem 2rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  min-width: 220px;
-  animation: scaleIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform, opacity;
-  transform: translateZ(0);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(163, 230, 53, 0.1);
+  min-width: 240px;
+  animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .filtering-content {
@@ -489,40 +489,22 @@ const exportCSV = () => {
 }
 
 .filtering-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--border-color);
+  width: 44px;
+  height: 44px;
+  border: 4px solid var(--bg-elevated);
   border-top-color: var(--accent-green);
   border-radius: var(--radius-full);
-  animation: spin 0.7s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  box-shadow: 0 0 16px rgba(163, 230, 53, 0.2);
 }
 
 .filtering-text {
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   font-family: var(--font-body);
   text-align: center;
   white-space: nowrap;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.fade-enter-active {
-  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fade-leave-active {
-  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 
 

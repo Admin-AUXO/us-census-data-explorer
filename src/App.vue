@@ -6,13 +6,12 @@
     <DimensionFilters :is-open="filtersOpen" @close="filtersOpen = false" />
 
     <Transition name="fade">
-      <div v-if="store.isLevelTransitioning || store.isLoading" class="level-transition-overlay">
+      <div v-if="store.isLoading && store.loadingProgress.stage" class="level-transition-overlay">
         <div class="transition-loader">
           <div class="loader-spinner"></div>
           <div class="loader-content">
             <p class="loader-text">{{ transitionMessage }}</p>
-            <p v-if="store.loadingProgress.stage" class="loader-stage">{{ store.loadingProgress.stage }}</p>
-            <div v-if="store.loadingProgress.total > 0" class="loader-progress">
+            <div v-if="store.loadingProgress.total > 0 && store.loadingProgress.percentage > 0" class="loader-progress">
               <div class="progress-bar">
                 <div 
                   class="progress-fill" 
@@ -142,20 +141,11 @@ const updateScrollTracker = () => {
 }
 
 const transitionMessage = computed(() => {
-  if (store.isLevelTransitioning || store.isLoading) {
-    if (store.navigationDirection === 'backward') {
-      if (store.currentLevel === 'county') return 'Returning to States'
-      if (store.currentLevel === 'zcta5') return 'Returning to Counties'
-      return 'Returning...'
-    } else {
-      if (store.currentLevel === 'state') return 'Loading Counties'
-      if (store.currentLevel === 'county') return 'Loading ZIP Codes'
-      if (store.loadingProgress.stage) return store.loadingProgress.stage
-      return 'Loading Data...'
-    }
+  if (!store.isLoading) return ''
+  if (store.loadingProgress.stage) {
+    return store.loadingProgress.stage
   }
-  if (store.loadingProgress.stage) return store.loadingProgress.stage
-  return 'Loading...'
+  return 'Loading Data...'
 })
 
 const handleKeydown = (event) => {

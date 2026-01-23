@@ -59,7 +59,7 @@
       </div>
     </div>
 
-    <div v-if="store.isLoading" class="loading-bar">
+    <div v-if="store.isLoading && store.loadingProgress.stage" class="loading-bar">
       <div class="loading-progress"></div>
     </div>
   </div>

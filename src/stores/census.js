@@ -303,7 +303,7 @@ export const useCensusStore = defineStore('census', () => {
 
     try {
       const baseName = filename.replace('.csv', '')
-      loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: `Loading ${levelNames[level]} data...` }
+      loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: '' }
       
       const filePath = getDataPath(`data/${baseName}_${level}.csv`)
       if (import.meta.env.DEV) {
@@ -326,25 +326,23 @@ export const useCensusStore = defineStore('census', () => {
         loadingProgress.value.total = parseInt(contentLength, 10)
       }
 
-      loadingProgress.value.stage = `Downloading ${levelNames[level]}...`
+      loadingProgress.value.stage = `Loading ${levelNames[level]}...`
       const text = await response.text()
       
       if (!text || text.trim().length === 0) {
         throw new Error(`Empty file received from ${filePath}`)
       }
       
-      loadingProgress.value.stage = `Processing ${levelNames[level]}...`
       let levelData
       try {
         levelData = await parseCSV(text, (progress) => {
-          loadingProgress.value = { ...progress, stage: progress.stage || `Processing ${levelNames[level]}...` }
+          loadingProgress.value = { ...progress, stage: `Loading ${levelNames[level]}...` }
         })
       } catch (parseError) {
         console.error(`[Census Store] CSV parsing error for ${filePath}:`, parseError)
         throw new Error(`Failed to parse CSV: ${parseError.message || parseError}`)
       }
       
-      loadingProgress.value.stage = `Finalizing ${levelNames[level]}...`
       
       if (!levelData || !Array.isArray(levelData)) {
         const errorMsg = `Invalid data format returned from ${filePath}. Expected array, got ${typeof levelData}`
@@ -366,12 +364,12 @@ export const useCensusStore = defineStore('census', () => {
         console.log(`[Census Store] ${levelNames[level]} data loaded and cached: ${levelData.length} rows`)
       }
 
-      loadingProgress.value = { loaded: levelData.length, total: levelData.length, percentage: 100, stage: `${levelNames[level]} loaded` }
+      loadingProgress.value = { loaded: levelData.length, total: levelData.length, percentage: 100, stage: '' }
       
       return levelData
     } catch (error) {
       console.error(`Failed to load ${level} dataset:`, error)
-      loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: `Failed to load ${levelNames[level]}` }
+      loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: '' }
       throw error
     } finally {
       levelLoadingState.value[level] = false

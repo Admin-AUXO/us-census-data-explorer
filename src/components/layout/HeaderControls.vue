@@ -192,7 +192,7 @@
         </div>
       </div>
 
-      <div v-if="store.isLoading" class="loading-indicator">
+      <div v-if="store.isLoading && store.loadingProgress.stage" class="loading-indicator">
         <div class="loading-bar"></div>
       </div>
     </div>

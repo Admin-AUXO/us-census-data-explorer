@@ -60,41 +60,55 @@ export const useCensusStore = defineStore('census', () => {
     return 'United States'
   })
 
-  const filteredData = computed(() => {
-    let dataset = null
-
+  const levelDataCache = computed(() => {
     switch (currentLevel.value) {
       case 'state':
-        dataset = data.value.state
-        break
+        return data.value.state
       case 'county':
-        if (!data.value.county) return null
-        if (!currentState.value) return data.value.county
-        dataset = data.value.county.filter(d => d.state_name === currentState.value)
-        break
+        if (!data.value.county || !currentState.value) return data.value.county
+        return data.value.county.filter(d => d.state_name === currentState.value)
       case 'zcta5':
-        if (!data.value.zcta5) return null
-        if (!currentState.value || !currentCounty.value) return null
-        dataset = data.value.zcta5.filter(d =>
+        if (!data.value.zcta5 || !currentState.value || !currentCounty.value) return null
+        return data.value.zcta5.filter(d =>
           d.state_name === currentState.value && d.county_name === currentCounty.value
         )
-        break
+      default:
+        return null
     }
+  })
+
+  const filteredData = computed(() => {
+    const dataset = levelDataCache.value
 
     if (!dataset || !Array.isArray(dataset) || dataset.length === 0) return null
 
-    let filtered = dataset
     const level = currentLevel.value
     const filters = dimensionFilters
     const query = searchQuery.value?.toLowerCase() || ''
 
+    const hasActiveFilters =
+      filters.selectedStates.length > 0 ||
+      filters.selectedRegions.length > 0 ||
+      filters.selectedDivisions.length > 0 ||
+      filters.selectedCongressionalDistricts.length > 0 ||
+      filters.selectedAiannh.length > 0 ||
+      filters.selectedUrbanRural.length > 0 ||
+      filters.selectedMetroAreas.length > 0 ||
+      filters.populationMin !== null ||
+      filters.populationMax !== null ||
+      filters.areaMin !== null ||
+      filters.areaMax !== null ||
+      filters.metricValueMin !== null ||
+      filters.metricValueMax !== null ||
+      query !== ''
+
+    if (!hasActiveFilters) return dataset
+
     const firstRow = dataset[0]
-    const populationCol = firstRow && typeof firstRow === 'object' && firstRow !== null ? (
-      firstRow.total_population_2024 || 
-      firstRow.total_population_2023 ||
-      firstRow.total_population_2022 ||
-      (Object.keys(firstRow).find(k => k.includes('total_population')) || null)
-    ) : null
+    const populationCol = firstRow?.total_population_2024 ||
+      firstRow?.total_population_2023 ||
+      firstRow?.total_population_2022 ||
+      Object.keys(firstRow || {}).find(k => k.includes('total_population')) || null
 
     const popMin = filters.populationMin !== null && filters.populationMin !== '' ? parseFloat(filters.populationMin) : null
     const popMax = filters.populationMax !== null && filters.populationMax !== '' ? parseFloat(filters.populationMax) : null
@@ -103,53 +117,58 @@ export const useCensusStore = defineStore('census', () => {
     const metricMin = currentMetric.value && filters.metricValueMin !== null && filters.metricValueMin !== '' ? parseFloat(filters.metricValueMin) : null
     const metricMax = currentMetric.value && filters.metricValueMax !== null && filters.metricValueMax !== '' ? parseFloat(filters.metricValueMax) : null
 
-    filtered = filtered.filter(d => {
+    const selectedStatesSet = new Set(filters.selectedStates)
+    const selectedRegionsSet = new Set(filters.selectedRegions)
+    const selectedDivisionsSet = new Set(filters.selectedDivisions)
+    const selectedUrbanRuralSet = new Set(filters.selectedUrbanRural)
+    const selectedMetroAreasSet = new Set(filters.selectedMetroAreas)
+    const selectedAiannhSet = new Set(filters.selectedAiannh)
+    const selectedCongressionalDistrictsSet = new Set(filters.selectedCongressionalDistricts)
+
+    return dataset.filter(d => {
       if (!d || typeof d !== 'object') return false
-      
+
       if (level === 'state') {
-        if (filters.selectedStates.length > 0 && dataset && Array.isArray(dataset)) {
-          const allStates = new Set(dataset.map(item => item?.state_name).filter(Boolean))
-          if (filters.selectedStates.length < allStates.size && !filters.selectedStates.includes(d.state_name)) {
-            return false
-          }
+        if (selectedStatesSet.size > 0 && !selectedStatesSet.has(d.state_name)) {
+          return false
         }
-        if (filters.selectedRegions.length > 0) {
+        if (selectedRegionsSet.size > 0) {
           const regionName = getRegionName(d.census_region)
-          if (!filters.selectedRegions.includes(regionName)) return false
+          if (!selectedRegionsSet.has(regionName)) return false
         }
-        if (filters.selectedDivisions.length > 0) {
+        if (selectedDivisionsSet.size > 0) {
           const divisionName = getDivisionName(d.census_division)
-          if (!filters.selectedDivisions.includes(divisionName)) return false
+          if (!selectedDivisionsSet.has(divisionName)) return false
         }
       } else if (level === 'county') {
-        if (filters.selectedCongressionalDistricts.length > 0) {
+        if (selectedCongressionalDistrictsSet.size > 0) {
           const cd = d.congressional_district || d.cd116 || ''
-          if (cd && !filters.selectedCongressionalDistricts.includes(cd)) return false
+          if (cd && !selectedCongressionalDistrictsSet.has(cd)) return false
         }
-        if (filters.selectedAiannh.length > 0) {
+        if (selectedAiannhSet.size > 0) {
           const aiannh = d.aiannh_name || 'N/A'
-          if (aiannh !== 'N/A' && !filters.selectedAiannh.includes(aiannh)) return false
+          if (aiannh !== 'N/A' && !selectedAiannhSet.has(aiannh)) return false
         }
-        if (filters.selectedUrbanRural.length > 0) {
+        if (selectedUrbanRuralSet.size > 0) {
           const ur = d.urban_rural || 'N/A'
-          if (!filters.selectedUrbanRural.includes(ur)) return false
+          if (!selectedUrbanRuralSet.has(ur)) return false
         }
-        if (filters.selectedMetroAreas.length > 0) {
+        if (selectedMetroAreasSet.size > 0) {
           const metro = d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)
-          if (metro && !filters.selectedMetroAreas.includes(metro)) return false
+          if (metro && !selectedMetroAreasSet.has(metro)) return false
         }
       } else if (level === 'zcta5') {
-        if (filters.selectedUrbanRural.length > 0) {
+        if (selectedUrbanRuralSet.size > 0) {
           const ur = d.urban_rural || 'N/A'
-          if (!filters.selectedUrbanRural.includes(ur)) return false
+          if (!selectedUrbanRuralSet.has(ur)) return false
         }
-        if (filters.selectedAiannh.length > 0) {
+        if (selectedAiannhSet.size > 0) {
           const aiannh = d.aiannh_name || 'N/A'
-          if (aiannh !== 'N/A' && !filters.selectedAiannh.includes(aiannh)) return false
+          if (aiannh !== 'N/A' && !selectedAiannhSet.has(aiannh)) return false
         }
-        if (filters.selectedMetroAreas.length > 0) {
+        if (selectedMetroAreasSet.size > 0) {
           const metro = d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)
-          if (metro && !filters.selectedMetroAreas.includes(metro)) return false
+          if (metro && !selectedMetroAreasSet.has(metro)) return false
         }
       }
 
@@ -178,21 +197,22 @@ export const useCensusStore = defineStore('census', () => {
         if (val > metricMax) return false
       }
 
-      if (query && d && typeof d === 'object') {
-        let found = false
-        for (const key in d) {
-          if (d.hasOwnProperty(key) && String(d[key]).toLowerCase().includes(query)) {
-            found = true
-            break
-          }
-        }
+      if (query) {
+        const searchableFields = level === 'state'
+          ? [d.state_name, d.state_abbr]
+          : level === 'county'
+          ? [d.county_name, d.state_name, d.urban_area_name]
+          : [d.zcta5, d.county_name, d.state_name]
+
+        const found = searchableFields.some(field =>
+          field && String(field).toLowerCase().includes(query)
+        )
+
         if (!found) return false
       }
 
       return true
     })
-
-    return filtered
   })
 
   const getRegionName = (code) => {
@@ -242,21 +262,23 @@ export const useCensusStore = defineStore('census', () => {
   const parseCSV = async (text, onProgress) => {
     return new Promise((resolve, reject) => {
       let rowCount = 0
-      const estimatedTotal = Math.max(1000, text.split('\n').length - 1)
-      
+      const lines = text.split('\n')
+      const estimatedTotal = Math.max(1000, lines.length - 1)
+
       Papa.parse(text, {
         header: true,
         dynamicTyping: true,
         skipEmptyLines: true,
-        worker: false,
         fastMode: true,
+        worker: false,
         step: (result) => {
           rowCount++
-          if (onProgress && rowCount % 500 === 0) {
+          if (onProgress && rowCount % 1000 === 0) {
             const percentage = Math.min(95, Math.round((rowCount / estimatedTotal) * 100))
             onProgress({ loaded: rowCount, total: estimatedTotal, percentage, stage: 'Parsing data...' })
           }
         },
+        chunkSize: 1024 * 1024,
         complete: (results) => {
           if (onProgress) {
             onProgress({ loaded: results.data.length, total: results.data.length, percentage: 100, stage: 'Processing complete' })
@@ -380,7 +402,7 @@ export const useCensusStore = defineStore('census', () => {
       }
 
       if (currentLevel.value === 'state' && !hasCounty) {
-        setTimeout(() => preloadNextLevel(), 2000)
+        setTimeout(() => preloadNextLevel(), 1000)
       }
 
       return data.value

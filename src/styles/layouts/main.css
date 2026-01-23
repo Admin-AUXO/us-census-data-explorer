@@ -1,7 +1,8 @@
 .main-content {
   flex: 1;
-  padding: var(--spacing-lg) 0;
+  padding: var(--spacing-section) 0;
   transition: margin-right var(--duration-normal) var(--easing-standard);
+  min-height: 0;
 }
 
 .main-content.with-sidebar {
@@ -22,9 +23,9 @@
 
 .container {
   width: 100%;
-  max-width: 100%;
+  max-width: var(--size-container-max-content);
   margin: 0 auto;
-  padding: 0 var(--spacing-sm);
+  padding: 0 var(--spacing-container);
 }
 
 .data-container {
@@ -32,23 +33,55 @@
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
   border: var(--border-width-sm) solid var(--border-color);
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
+  margin-top: var(--spacing-lg);
+  transition: all var(--duration-normal) var(--easing-smooth);
+}
+
+.data-container:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-color-light);
 }
 
 .table-wrapper {
-  padding: var(--spacing-sm);
+  padding: var(--spacing-card);
   width: 100%;
   overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: background var(--duration-fast) var(--easing-smooth);
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-green-opacity-40);
 }
 
 .empty-state {
   text-align: center;
-  padding: var(--spacing-3xl) var(--spacing-xl);
+  padding: var(--spacing-6xl) var(--spacing-xl);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
+  min-height: 400px;
+  justify-content: center;
 }
 
 .empty-state-icon {
@@ -84,18 +117,20 @@
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md);
+  padding: var(--spacing-component);
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
   border: var(--border-width-sm) solid var(--border-color);
   min-width: 180px;
-  transition: all var(--duration-fast) var(--easing-standard);
+  transition: all var(--duration-normal) var(--easing-smooth);
+  cursor: pointer;
 }
 
 .feature-item:hover {
   background: var(--bg-elevated);
   border-color: var(--accent-green);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .feature-item svg {

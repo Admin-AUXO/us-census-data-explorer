@@ -811,7 +811,7 @@
   }
 
   .main-content {
-    padding: 0.5rem 0 !important;
+    padding: var(--spacing-lg) 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     min-height: 0 !important;
@@ -825,14 +825,14 @@
   }
 
   .container {
-    padding: 0.5rem 0.75rem !important;
+    padding: 0 var(--spacing-container) !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
     flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 0.5rem !important;
+    gap: var(--spacing-md) !important;
     min-height: 0 !important;
     overflow: visible !important;
   }
@@ -840,7 +840,7 @@
   .data-container {
     border-radius: var(--radius-lg) !important;
     margin: 0 !important;
-    margin-top: 0.5rem !important;
+    margin-top: var(--spacing-md) !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -855,7 +855,7 @@
   }
 
   .table-wrapper {
-    padding: 0.5rem !important;
+    padding: var(--spacing-card) !important;
     overflow-x: auto !important;
     overflow-y: visible !important;
     -webkit-overflow-scrolling: touch !important;
@@ -932,51 +932,57 @@
   }
 
   .data-table th.col-abbr {
-    min-width: 40px !important;
-    max-width: 50px !important;
+    min-width: 50px !important;
+    width: 50px !important;
   }
 
   .data-table th.col-region {
-    min-width: 70px !important;
-    max-width: 90px !important;
+    min-width: 90px !important;
+    width: 90px !important;
   }
 
   .data-table th.col-urban-rural {
-    min-width: 85px !important;
-    max-width: 110px !important;
+    min-width: 100px !important;
+    width: 100px !important;
   }
 
   .data-table th.col-metro {
-    min-width: 140px !important;
-    max-width: 200px !important;
+    min-width: 160px !important;
+    width: 160px !important;
   }
 
   .data-table th.col-aiannh {
-    min-width: 140px !important;
-    max-width: 200px !important;
+    min-width: 160px !important;
+    width: 160px !important;
   }
 
   .data-table th.col-area {
-    min-width: 75px !important;
-    max-width: 95px !important;
+    min-width: 90px !important;
+    width: 90px !important;
     font-size: 0.6875rem !important;
   }
 
   .data-table th.col-value {
-    min-width: 100px !important;
-    max-width: 130px !important;
+    min-width: 120px !important;
+    width: 120px !important;
+    font-size: 0.6875rem !important;
+  }
+
+  .data-table th.col-compare {
+    min-width: 120px !important;
+    width: 120px !important;
     font-size: 0.6875rem !important;
   }
 
   .data-table th.col-change {
-    min-width: 85px !important;
-    max-width: 100px !important;
+    min-width: 110px !important;
+    width: 110px !important;
     font-size: 0.6875rem !important;
   }
 
   .data-table th.col-count {
-    min-width: 80px !important;
-    max-width: 100px !important;
+    min-width: 100px !important;
+    width: 100px !important;
   }
 
   .data-table th.col-state {
@@ -1026,26 +1032,26 @@
   }
 
   .data-table td.col-abbr {
-    min-width: 40px !important;
-    max-width: 50px !important;
+    min-width: 50px !important;
+    width: 50px !important;
     text-align: center !important;
   }
 
   .data-table td.col-region {
-    min-width: 70px !important;
-    max-width: 90px !important;
+    min-width: 90px !important;
+    width: 90px !important;
     text-align: center !important;
   }
 
   .data-table td.col-urban-rural {
-    min-width: 60px !important;
-    max-width: 80px !important;
+    min-width: 100px !important;
+    width: 100px !important;
     text-align: center !important;
   }
 
   .data-table td.col-metro {
-    min-width: 140px !important;
-    max-width: 200px !important;
+    min-width: 160px !important;
+    width: 160px !important;
     text-align: left !important;
     white-space: normal !important;
     word-wrap: break-word !important;
@@ -1057,8 +1063,8 @@
   }
 
   .data-table td.col-aiannh {
-    min-width: 140px !important;
-    max-width: 200px !important;
+    min-width: 160px !important;
+    width: 160px !important;
     text-align: left !important;
     white-space: normal !important;
     word-wrap: break-word !important;
@@ -1070,26 +1076,32 @@
   }
 
   .data-table td.col-area {
-    min-width: 70px !important;
-    max-width: 90px !important;
+    min-width: 90px !important;
+    width: 90px !important;
     text-align: center !important;
   }
 
   .data-table td.col-value {
-    min-width: 100px !important;
-    max-width: 130px !important;
+    min-width: 120px !important;
+    width: 120px !important;
+    text-align: center !important;
+  }
+
+  .data-table td.col-compare {
+    min-width: 120px !important;
+    width: 120px !important;
     text-align: center !important;
   }
 
   .data-table td.col-change {
-    min-width: 85px !important;
-    max-width: 100px !important;
+    min-width: 110px !important;
+    width: 110px !important;
     text-align: center !important;
   }
 
   .data-table td.col-count {
-    min-width: 80px !important;
-    max-width: 100px !important;
+    min-width: 100px !important;
+    width: 100px !important;
     text-align: center !important;
   }
 

@@ -474,6 +474,26 @@ const exportCSV = () => {
   contain: layout style paint;
   will-change: scroll-position;
   box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: background var(--duration-fast) var(--easing-smooth);
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-green-opacity-40);
 }
 
 .table-container.filtering {

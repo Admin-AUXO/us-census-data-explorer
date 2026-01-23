@@ -121,17 +121,117 @@
 }
 
 .fade-enter-active {
-  animation: fadeIn var(--duration-normal) var(--easing-standard);
+  animation: fadeIn var(--duration-normal) var(--easing-smooth);
 }
 
 .fade-leave-active {
-  animation: fadeOut var(--duration-normal) var(--easing-standard);
+  animation: fadeOut var(--duration-normal) var(--easing-smooth);
 }
 
 .slide-enter-active {
-  animation: slideInRight var(--duration-normal) var(--easing-standard);
+  animation: slideInRight var(--duration-normal) var(--easing-smooth);
 }
 
 .slide-leave-active {
-  animation: slideOutRight var(--duration-normal) var(--easing-standard);
+  animation: slideOutRight var(--duration-normal) var(--easing-smooth);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleInUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp var(--duration-normal) var(--easing-smooth);
+}
+
+.animate-slide-down {
+  animation: slideDown var(--duration-normal) var(--easing-smooth);
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--duration-normal) var(--easing-smooth);
+}
+
+.animate-scale-in-up {
+  animation: scaleInUp var(--duration-normal) var(--easing-smooth);
+}
+
+.animate-pulse {
+  animation: pulse 2s var(--easing-standard) infinite;
+}
+
+.animate-float {
+  animation: float 3s var(--easing-standard) infinite;
+}
+
+.transition-smooth {
+  transition: all var(--duration-normal) var(--easing-smooth);
+}
+
+.transition-fast {
+  transition: all var(--duration-fast) var(--easing-smooth);
+}
+
+.hover-lift {
+  transition: transform var(--duration-normal) var(--easing-smooth);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+.hover-scale {
+  transition: transform var(--duration-normal) var(--easing-smooth);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-glow {
+  transition: box-shadow var(--duration-normal) var(--easing-smooth);
+}
+
+.hover-glow:hover {
+  box-shadow: var(--shadow-accent-md);
 }

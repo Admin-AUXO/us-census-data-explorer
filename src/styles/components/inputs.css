@@ -10,7 +10,7 @@ textarea {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   font-family: var(--font-body);
-  transition: all var(--duration-fast) var(--easing-standard);
+  transition: all var(--duration-normal) var(--easing-smooth);
   height: var(--component-height-md);
   min-height: var(--component-height-md);
   box-sizing: border-box;

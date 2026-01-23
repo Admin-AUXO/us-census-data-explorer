@@ -84,6 +84,12 @@
   --spacing-2xl: 2.5rem;
   --spacing-3xl: 3rem;
   --spacing-4xl: 3.5rem;
+  --spacing-5xl: 4rem;
+  --spacing-6xl: 5rem;
+  --spacing-container: clamp(1rem, 4vw, 2.5rem);
+  --spacing-section: clamp(2rem, 6vw, 4rem);
+  --spacing-card: clamp(1rem, 3vw, 1.5rem);
+  --spacing-component: clamp(0.75rem, 2vw, 1.25rem);
   --duration-fast: 200ms;
   --duration-normal: 250ms;
   --duration-slow: 300ms;
@@ -91,6 +97,9 @@
   --duration-slowest: 400ms;
   --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --easing-spinner: cubic-bezier(0.5, 0, 0.5, 1);
+  --easing-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --z-index-base: 1;
   --z-index-dropdown: 100;
   --z-index-sticky: 200;
@@ -123,6 +132,8 @@
   --size-sidebar-width: 520px;
   --size-sidebar-width-mobile: 100vw;
   --size-container-max: 100%;
+  --size-container-max-content: 1920px;
+  --size-container-max-readable: 1400px;
   --size-input-height: 2rem;
   --size-button-height-sm: 1.75rem;
   --size-button-height-md: 2rem;

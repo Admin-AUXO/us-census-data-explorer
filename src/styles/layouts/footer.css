@@ -1,16 +1,16 @@
 .footer {
   background: var(--bg-card);
   color: var(--text-primary);
-  padding: var(--spacing-2xl) 0 var(--spacing-lg);
+  padding: var(--spacing-section) 0 var(--spacing-lg);
   margin-top: auto;
   border-top: var(--border-width-sm) solid var(--border-color);
 }
 
 .footer-container {
   width: 100%;
-  max-width: 100%;
+  max-width: var(--size-container-max-content);
   margin: 0 auto;
-  padding: 0 var(--spacing-sm);
+  padding: 0 var(--spacing-container);
   box-sizing: border-box;
 }
 
@@ -84,7 +84,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  transition: all var(--duration-fast) var(--easing-standard);
+  transition: all var(--duration-normal) var(--easing-smooth);
   font-size: var(--font-size-md);
   padding: var(--spacing-sm) var(--spacing-sm);
   margin: 0 calc(-1 * var(--spacing-sm));

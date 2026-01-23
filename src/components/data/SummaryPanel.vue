@@ -572,20 +572,26 @@ const trendInfo = computed(() => {
   background: var(--bg-card);
   border-radius: var(--radius-xl);
   padding: 0;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
   box-shadow: var(--shadow);
   border: 1px solid var(--border-color);
   overflow: hidden;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  transition: all var(--duration-normal) var(--easing-smooth);
+}
+
+.summary-panel:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-color-light);
 }
 
 .summary-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-md) var(--spacing-sm);
+  padding: var(--spacing-component) var(--spacing-card);
   width: 100%;
   box-sizing: border-box;
   background: var(--bg-elevated);
@@ -619,7 +625,7 @@ const trendInfo = computed(() => {
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: all var(--duration-fast) var(--easing-standard);
+  transition: all var(--duration-normal) var(--easing-smooth);
 }
 
 .collapse-btn:hover {
@@ -634,7 +640,7 @@ const trendInfo = computed(() => {
 }
 
 .summary-content {
-  padding: var(--spacing-md) var(--spacing-sm);
+  padding: var(--spacing-card);
   width: 100%;
   box-sizing: border-box;
   background: var(--bg-card);
@@ -654,7 +660,7 @@ const trendInfo = computed(() => {
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   width: 100%;
   box-sizing: border-box;
 }
@@ -677,15 +683,15 @@ const trendInfo = computed(() => {
 .summary-card {
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: var(--spacing-component);
   box-shadow: var(--shadow-sm);
-  transition: all var(--duration-normal) var(--easing-standard);
+  transition: all var(--duration-normal) var(--easing-smooth);
   border: 1px solid var(--border-color);
 }
 
 .summary-card:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-4px) scale(1.01);
   border-color: var(--accent-green-opacity-30);
 }
 
@@ -856,17 +862,18 @@ const trendInfo = computed(() => {
   grid-template-columns: auto 1fr auto auto;
   gap: 0.875rem;
   align-items: center;
-  padding: 0.875rem 1rem;
+  padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--radius-md);
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
-  transition: all var(--duration-fast) var(--easing-standard);
+  transition: all var(--duration-normal) var(--easing-smooth);
 }
 
 .performer-item:hover {
   background: var(--bg-surface);
   border-color: var(--accent-green);
-  transform: translateX(4px);
+  transform: translateX(4px) scale(1.01);
+  box-shadow: var(--shadow-sm);
 }
 
 .performer-item.top {
@@ -928,7 +935,7 @@ const trendInfo = computed(() => {
 
 .expand-enter-active,
 .expand-leave-active {
-  transition: all var(--duration-slow) var(--easing-standard);
+  transition: all var(--duration-slow) var(--easing-smooth);
   max-height: 2000px;
   overflow: hidden;
 }

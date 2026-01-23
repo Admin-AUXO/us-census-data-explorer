@@ -466,9 +466,11 @@ const exportCSV = () => {
   overflow-x: auto;
   overflow-y: visible;
   width: 100%;
+  max-width: 100%;
   -webkit-overflow-scrolling: touch;
   contain: layout style paint;
   will-change: scroll-position;
+  box-sizing: border-box;
 }
 
 .table-container.filtering {
@@ -496,7 +498,7 @@ const exportCSV = () => {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 1.75rem 2rem;
+  padding: var(--spacing-md) var(--spacing-sm);
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
@@ -544,14 +546,16 @@ const exportCSV = () => {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem 1.5rem;
+  padding: var(--spacing-sm);
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-sm);
   flex-wrap: wrap;
   animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: opacity, transform;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @keyframes fadeInUp {

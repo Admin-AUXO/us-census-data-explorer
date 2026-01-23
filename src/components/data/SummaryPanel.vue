@@ -572,10 +572,13 @@ const trendInfo = computed(() => {
   background: var(--bg-card);
   border-radius: var(--radius-xl);
   padding: 0;
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-md);
   box-shadow: var(--shadow);
   border: 1px solid var(--border-color);
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .summary-header {
@@ -651,7 +654,9 @@ const trendInfo = computed(() => {
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-xl);
+  gap: var(--spacing-md);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 1200px) {

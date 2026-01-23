@@ -217,7 +217,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useCensusStore } from '../stores/census'
+import { useCensusStore } from '../../stores/census'
 import {
   BarChart3,
   ChevronDown,
@@ -504,7 +504,6 @@ const trendInfo = computed(() => {
   const avgChange = values.reduce((sum, v) => sum + v.change, 0) / values.length
   const avgAnnualGrowth = yearsDiff > 0 ? avgChange / yearsDiff : avgChange
 
-  const allYears = store.availableYears || []
   const yearValues = []
   for (let year = Math.min(compareYear, currentYear); year <= Math.max(compareYear, currentYear); year++) {
     const yearMetric = `${baseMetric}_${year}`

@@ -48,8 +48,8 @@
           <div class="filtering-loader">
             <div class="filtering-spinner"></div>
             <div class="filtering-content">
-              <span class="filtering-text">Applying filters...</span>
-              <span class="filtering-subtext">Processing data</span>
+              <span class="filtering-text">Filtering data...</span>
+              <span class="filtering-subtext">Updating results</span>
             </div>
           </div>
         </div>
@@ -125,10 +125,13 @@
 </template>
 
 <script setup>
-import { computed, watch } from 'vue'
-import { useCensusStore } from '../stores/census'
+import { computed, ref } from 'vue'
+import { useCensusStore } from '../../stores/census'
+import { formatValue, formatArea } from '../../utils/formatUtils'
 
 const store = useCensusStore()
+const childCountCache = ref(new Map())
+const zipCountCache = ref(new Map())
 
 const sortedData = computed(() => {
   const data = store.filteredData
@@ -167,9 +170,15 @@ const metricLabel = computed(() => {
 })
 
 const values = computed(() => {
-  return sortedData.value
-    .map(row => parseFloat(row[store.currentMetric]))
-    .filter(v => !isNaN(v) && v > 0)
+  if (!sortedData.value || sortedData.value.length === 0) return []
+  const metric = store.currentMetric
+  if (!metric) return []
+  const result = []
+  for (let i = 0; i < sortedData.value.length; i++) {
+    const val = parseFloat(sortedData.value[i][metric])
+    if (!isNaN(val) && val > 0) result.push(val)
+  }
+  return result
 })
 
 const minValue = computed(() => values.value.length > 0 ? Math.min(...values.value) : 0)
@@ -216,12 +225,6 @@ const getSortIcon = (column) => {
   return store.sortDirection === 'asc' ? '↑' : '↓'
 }
 
-const formatValue = (value) => {
-  if (value == null || value === '') return 'N/A'
-  const num = parseFloat(value)
-  if (isNaN(num)) return value
-  return num.toLocaleString('en-US', { maximumFractionDigits: 2 })
-}
 
 const getColorForIntensity = (intensity) => {
   const lowColor = { r: 30, g: 40, b: 60 }
@@ -354,29 +357,57 @@ const getChangeClass = (row) => {
 
 const getChildCount = (row) => {
   if (store.currentLevel === 'state') {
-    return store.data.county?.filter(c => c.state_name === row.state_name).length || 0
+    const key = `state_${row.state_name}`
+    if (childCountCache.value.has(key)) {
+      return childCountCache.value.get(key)
+    }
+    const count = store.data.county?.filter(c => c.state_name === row.state_name).length || 0
+    if (childCountCache.value.size < 100) {
+      childCountCache.value.set(key, count)
+    }
+    return count
   } else if (store.currentLevel === 'county') {
-    return store.data.zcta5?.filter(z =>
+    const key = `county_${store.currentState}_${row.county_name}`
+    if (childCountCache.value.has(key)) {
+      return childCountCache.value.get(key)
+    }
+    const count = store.data.zcta5?.filter(z =>
       z.state_name === store.currentState && z.county_name === row.county_name
     ).length || 0
+    if (childCountCache.value.size < 100) {
+      childCountCache.value.set(key, count)
+    }
+    return count
   }
   return 0
 }
 
 const getZipCount = (row) => {
   if (store.currentLevel === 'state') {
+    const key = `zip_${row.state_name}`
+    if (zipCountCache.value.has(key)) {
+      return zipCountCache.value.get(key)
+    }
     if (!store.data.zcta5 || store.data.zcta5.length === 0) {
       return 'N/A'
     }
     const count = store.data.zcta5.filter(z => z.state_name === row.state_name).length
-    return count > 0 ? count : 0
+    const result = count > 0 ? count : 0
+    if (zipCountCache.value.size < 100) {
+      zipCountCache.value.set(key, result)
+    }
+    return result
   }
   return 0
 }
 
 const hasAiannh = computed(() => {
   if (!sortedData.value || sortedData.value.length === 0) return false
-  return sortedData.value.some(row => row.aiannh_name && row.aiannh_name !== 'N/A' && row.aiannh_name !== '')
+  for (let i = 0; i < Math.min(100, sortedData.value.length); i++) {
+    const aiannh = sortedData.value[i].aiannh_name
+    if (aiannh && aiannh !== 'N/A' && aiannh !== '') return true
+  }
+  return false
 })
 
 const getRegionName = (code) => {
@@ -389,13 +420,6 @@ const getRegionName = (code) => {
   return regions[code] || 'N/A'
 }
 
-const formatArea = (area) => {
-  if (!area || area === 0) return 'N/A'
-  const num = parseFloat(area)
-  if (isNaN(num)) return 'N/A'
-  if (num < 1) return num.toFixed(3)
-  return num.toFixed(2)
-}
 
 const exportCSV = () => {
   if (!sortedData.value || sortedData.value.length === 0) {
@@ -437,6 +461,8 @@ const exportCSV = () => {
   overflow-y: visible;
   width: 100%;
   -webkit-overflow-scrolling: touch;
+  contain: layout style paint;
+  will-change: scroll-position;
 }
 
 .table-container.filtering {

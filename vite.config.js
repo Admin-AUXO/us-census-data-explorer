@@ -2,8 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 
-export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/us-census-data-explorer/' : '/',
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/us-census-data-explorer/' : '/',
   plugins: [vue()],
   resolve: {
     alias: {
@@ -26,4 +26,4 @@ export default defineConfig({
       }
     }
   }
-})
+}))

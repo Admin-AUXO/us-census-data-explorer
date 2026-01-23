@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed, reactive, watch } from 'vue'
-import Papa from 'papaparse'
+import { getDataPath } from '../utils/dataLoader'
+import { createFilterSet, checkFilterMatch, parseNumericFilter, checkNumericRange, searchInFields } from '../utils/filterUtils'
+import { parseCSV } from '../utils/csvParser'
 
 export const useCensusStore = defineStore('census', () => {
   const currentLevel = ref('state')
@@ -77,6 +79,9 @@ export const useCensusStore = defineStore('census', () => {
     }
   })
 
+  const filterCache = ref(new Map())
+  const lastFilterKey = ref('')
+
   const filteredData = computed(() => {
     const dataset = levelDataCache.value
 
@@ -104,97 +109,95 @@ export const useCensusStore = defineStore('census', () => {
 
     if (!hasActiveFilters) return dataset
 
+    const filterKey = `${level}_${JSON.stringify(filters)}_${query}_${currentMetric.value}`
+    if (filterCache.value.has(filterKey) && lastFilterKey.value === filterKey) {
+      return filterCache.value.get(filterKey)
+    }
+    
+    if (filterCache.value.size > 10) {
+      filterCache.value.clear()
+    }
+
     const firstRow = dataset[0]
     const populationCol = firstRow?.total_population_2024 ||
       firstRow?.total_population_2023 ||
       firstRow?.total_population_2022 ||
       Object.keys(firstRow || {}).find(k => k.includes('total_population')) || null
 
-    const popMin = filters.populationMin !== null && filters.populationMin !== '' ? parseFloat(filters.populationMin) : null
-    const popMax = filters.populationMax !== null && filters.populationMax !== '' ? parseFloat(filters.populationMax) : null
-    const areaMin = filters.areaMin !== null && filters.areaMin !== '' ? parseFloat(filters.areaMin) : null
-    const areaMax = filters.areaMax !== null && filters.areaMax !== '' ? parseFloat(filters.areaMax) : null
-    const metricMin = currentMetric.value && filters.metricValueMin !== null && filters.metricValueMin !== '' ? parseFloat(filters.metricValueMin) : null
-    const metricMax = currentMetric.value && filters.metricValueMax !== null && filters.metricValueMax !== '' ? parseFloat(filters.metricValueMax) : null
+    const popMin = parseNumericFilter(filters.populationMin)
+    const popMax = parseNumericFilter(filters.populationMax)
+    const areaMin = parseNumericFilter(filters.areaMin)
+    const areaMax = parseNumericFilter(filters.areaMax)
+    const metricMin = currentMetric.value ? parseNumericFilter(filters.metricValueMin) : null
+    const metricMax = currentMetric.value ? parseNumericFilter(filters.metricValueMax) : null
 
-    const selectedStatesSet = new Set(filters.selectedStates)
-    const selectedRegionsSet = new Set(filters.selectedRegions)
-    const selectedDivisionsSet = new Set(filters.selectedDivisions)
-    const selectedUrbanRuralSet = new Set(filters.selectedUrbanRural)
-    const selectedMetroAreasSet = new Set(filters.selectedMetroAreas)
-    const selectedAiannhSet = new Set(filters.selectedAiannh)
-    const selectedCongressionalDistrictsSet = new Set(filters.selectedCongressionalDistricts)
+    const selectedStatesSet = createFilterSet(filters.selectedStates)
+    const selectedRegionsSet = createFilterSet(filters.selectedRegions)
+    const selectedDivisionsSet = createFilterSet(filters.selectedDivisions)
+    const selectedUrbanRuralSet = createFilterSet(filters.selectedUrbanRural)
+    const selectedMetroAreasSet = createFilterSet(filters.selectedMetroAreas)
+    const selectedAiannhSet = createFilterSet(filters.selectedAiannh)
+    const selectedCongressionalDistrictsSet = createFilterSet(filters.selectedCongressionalDistricts)
 
-    return dataset.filter(d => {
+    const result = dataset.filter(d => {
       if (!d || typeof d !== 'object') return false
 
       if (level === 'state') {
-        if (selectedStatesSet.size > 0 && !selectedStatesSet.has(d.state_name)) {
-          return false
-        }
-        if (selectedRegionsSet.size > 0) {
+        if (!checkFilterMatch(d.state_name, selectedStatesSet)) return false
+        if (selectedRegionsSet) {
           const regionName = getRegionName(d.census_region)
-          if (!selectedRegionsSet.has(regionName)) return false
+          if (!checkFilterMatch(regionName, selectedRegionsSet)) return false
         }
-        if (selectedDivisionsSet.size > 0) {
+        if (selectedDivisionsSet) {
           const divisionName = getDivisionName(d.census_division)
-          if (!selectedDivisionsSet.has(divisionName)) return false
+          if (!checkFilterMatch(divisionName, selectedDivisionsSet)) return false
         }
       } else if (level === 'county') {
-        if (selectedCongressionalDistrictsSet.size > 0) {
+        if (selectedCongressionalDistrictsSet) {
           const cd = d.congressional_district || d.cd116 || ''
-          if (cd && !selectedCongressionalDistrictsSet.has(cd)) return false
+          if (cd && !checkFilterMatch(cd, selectedCongressionalDistrictsSet)) return false
         }
-        if (selectedAiannhSet.size > 0) {
+        if (selectedAiannhSet) {
           const aiannh = d.aiannh_name || 'N/A'
-          if (aiannh !== 'N/A' && !selectedAiannhSet.has(aiannh)) return false
+          if (aiannh !== 'N/A' && !checkFilterMatch(aiannh, selectedAiannhSet)) return false
         }
-        if (selectedUrbanRuralSet.size > 0) {
+        if (selectedUrbanRuralSet) {
           const ur = d.urban_rural || 'N/A'
-          if (!selectedUrbanRuralSet.has(ur)) return false
+          if (!checkFilterMatch(ur, selectedUrbanRuralSet)) return false
         }
-        if (selectedMetroAreasSet.size > 0) {
+        if (selectedMetroAreasSet) {
           const metro = d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)
-          if (metro && !selectedMetroAreasSet.has(metro)) return false
+          if (metro && !checkFilterMatch(metro, selectedMetroAreasSet)) return false
         }
       } else if (level === 'zcta5') {
-        if (selectedUrbanRuralSet.size > 0) {
+        if (selectedUrbanRuralSet) {
           const ur = d.urban_rural || 'N/A'
-          if (!selectedUrbanRuralSet.has(ur)) return false
+          if (!checkFilterMatch(ur, selectedUrbanRuralSet)) return false
         }
-        if (selectedAiannhSet.size > 0) {
+        if (selectedAiannhSet) {
           const aiannh = d.aiannh_name || 'N/A'
-          if (aiannh !== 'N/A' && !selectedAiannhSet.has(aiannh)) return false
+          if (aiannh !== 'N/A' && !checkFilterMatch(aiannh, selectedAiannhSet)) return false
         }
-        if (selectedMetroAreasSet.size > 0) {
+        if (selectedMetroAreasSet) {
           const metro = d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)
-          if (metro && !selectedMetroAreasSet.has(metro)) return false
+          if (metro && !checkFilterMatch(metro, selectedMetroAreasSet)) return false
         }
       }
 
       if (popMin !== null && populationCol) {
-        const pop = parseFloat(d[populationCol]) || 0
-        if (pop < popMin) return false
+        if (!checkNumericRange(d[populationCol], popMin, popMax)) return false
+      } else if (popMax !== null && populationCol) {
+        if (!checkNumericRange(d[populationCol], null, popMax)) return false
       }
-      if (popMax !== null && populationCol) {
-        const pop = parseFloat(d[populationCol]) || 0
-        if (pop > popMax) return false
+
+      if (areaMin !== null || areaMax !== null) {
+        if (!checkNumericRange(d.land_area_sq_km, areaMin, areaMax)) return false
       }
-      if (areaMin !== null) {
-        const area = parseFloat(d.land_area_sq_km) || 0
-        if (area < areaMin) return false
-      }
-      if (areaMax !== null) {
-        const area = parseFloat(d.land_area_sq_km) || 0
-        if (area > areaMax) return false
-      }
+
       if (metricMin !== null && currentMetric.value) {
-        const val = parseFloat(d[currentMetric.value]) || 0
-        if (val < metricMin) return false
-      }
-      if (metricMax !== null && currentMetric.value) {
-        const val = parseFloat(d[currentMetric.value]) || 0
-        if (val > metricMax) return false
+        if (!checkNumericRange(d[currentMetric.value], metricMin, metricMax)) return false
+      } else if (metricMax !== null && currentMetric.value) {
+        if (!checkNumericRange(d[currentMetric.value], null, metricMax)) return false
       }
 
       if (query) {
@@ -204,15 +207,15 @@ export const useCensusStore = defineStore('census', () => {
           ? [d.county_name, d.state_name, d.urban_area_name]
           : [d.zcta5, d.county_name, d.state_name]
 
-        const found = searchableFields.some(field =>
-          field && String(field).toLowerCase().includes(query)
-        )
-
-        if (!found) return false
+        if (!searchInFields(d, query, searchableFields)) return false
       }
 
       return true
     })
+
+    filterCache.value.set(filterKey, result)
+    lastFilterKey.value = filterKey
+    return result
   })
 
   const getRegionName = (code) => {
@@ -241,15 +244,13 @@ export const useCensusStore = defineStore('census', () => {
   }
   
   const availableYears = computed(() => {
-    if (!data.value.state || !Array.isArray(data.value.state) || data.value.state.length === 0) return []
+    if (!data.value.state?.length) return []
     const firstRow = data.value.state[0]
-    if (!firstRow || typeof firstRow !== 'object' || firstRow === null) return []
-    const columns = Object.keys(firstRow)
-    const yearMatches = columns
-      .map(col => col.match(/_(\d{4})$/))
-      .filter(match => match)
-      .map(match => match[1])
-    return [...new Set(yearMatches)].sort().reverse()
+    if (!firstRow || typeof firstRow !== 'object') return []
+    return [...new Set(Object.keys(firstRow)
+      .map(col => col.match(/_(\d{4})$/)?.[1])
+      .filter(Boolean)
+    )].sort().reverse()
   })
   
   const getPreviousYear = (currentYear) => {
@@ -259,52 +260,37 @@ export const useCensusStore = defineStore('census', () => {
     return availableYears.value.includes(prevYear) ? prevYear : null
   }
 
-  const parseCSV = async (text, onProgress) => {
-    return new Promise((resolve, reject) => {
-      let rowCount = 0
-      const lines = text.split('\n')
-      const estimatedTotal = Math.max(1000, lines.length - 1)
-
-      Papa.parse(text, {
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        fastMode: true,
-        worker: false,
-        step: (result) => {
-          rowCount++
-          if (onProgress && rowCount % 1000 === 0) {
-            const percentage = Math.min(95, Math.round((rowCount / estimatedTotal) * 100))
-            onProgress({ loaded: rowCount, total: estimatedTotal, percentage, stage: 'Parsing data...' })
-          }
-        },
-        chunkSize: 1024 * 1024,
-        complete: (results) => {
-          if (onProgress) {
-            onProgress({ loaded: results.data.length, total: results.data.length, percentage: 100, stage: 'Processing complete' })
-          }
-          resolve(results.data)
-        },
-        error: (error) => reject(error)
-      })
-    })
-  }
 
   const loadManifest = async () => {
     try {
-      const baseUrl = import.meta.env.BASE_URL
-      const response = await fetch(`${baseUrl}data/manifest.json`)
-      if (!response.ok) throw new Error('Failed to load manifest')
-      manifest.value = await response.json()
+      const manifestPath = getDataPath('data/manifest.json')
+      if (import.meta.env.DEV) {
+        console.log(`[Census Store] Loading manifest from: ${manifestPath}`)
+      }
+      const response = await fetch(manifestPath)
+      if (!response.ok) {
+        const errorMsg = `Failed to load manifest: ${response.status} ${response.statusText} from ${manifestPath}. Check if file exists at public/data/manifest.json`
+        console.error(`[Census Store] ${errorMsg}`)
+        throw new Error(errorMsg)
+      }
+      const data = await response.json()
+      if (!data?.datasets?.length) {
+        throw new Error(`Invalid manifest format: expected datasets array`)
+      }
+      if (import.meta.env.DEV) {
+        console.log(`[Census Store] Manifest loaded: ${data.datasets.length} datasets`)
+      }
+      manifest.value = data
       return manifest.value
     } catch (error) {
-      console.error('Failed to load manifest:', error)
+      console.error('[Census Store] Failed to load manifest:', error)
       throw error
     }
   }
 
   const loadDatasetLevel = async (filename, level) => {
     const cacheKey = `${filename}_${level}`
+    const levelNames = { state: 'States', county: 'Counties', zcta5: 'ZIP Codes' }
     
     if (dataCache.value.has(cacheKey)) {
       const cached = dataCache.value.get(cacheKey)
@@ -316,40 +302,56 @@ export const useCensusStore = defineStore('census', () => {
     if (level === 'state') isLoading.value = true
 
     try {
-      const baseUrl = import.meta.env.BASE_URL
       const baseName = filename.replace('.csv', '')
+      loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: `Loading ${levelNames[level]} data...` }
       
-      loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: `Fetching ${level} data...` }
-      
-      const response = await fetch(`${baseUrl}data/${baseName}_${level}.csv`)
+      const filePath = getDataPath(`data/${baseName}_${level}.csv`)
+      console.log(`[Census Store] Loading ${level} data from: ${filePath}`)
+      const response = await fetch(filePath)
 
       if (!response.ok) {
-        throw new Error(`Failed to load ${level} data file`)
+        const errorMsg = `Failed to load ${level} data: ${response.status} ${response.statusText} from ${filePath}. Check if file exists and path is correct.`
+        console.error(`[Census Store] ${errorMsg}`)
+        throw new Error(errorMsg)
       }
+      
+      console.log(`[Census Store] ${level} data file found, size: ${response.headers.get('content-length') || 'unknown'} bytes`)
 
       const contentLength = response.headers.get('content-length')
       if (contentLength) {
         loadingProgress.value.total = parseInt(contentLength, 10)
       }
 
-      loadingProgress.value.stage = 'Downloading data...'
+      loadingProgress.value.stage = `Downloading ${levelNames[level]}...`
       const text = await response.text()
       
-      loadingProgress.value.stage = 'Parsing CSV data...'
+      loadingProgress.value.stage = `Processing ${levelNames[level]}...`
       const levelData = await parseCSV(text, (progress) => {
-        loadingProgress.value = { ...progress, stage: progress.stage || loadingProgress.value.stage }
+        loadingProgress.value = { ...progress, stage: progress.stage || `Processing ${levelNames[level]}...` }
       })
       
-      loadingProgress.value.stage = 'Finalizing...'
+      loadingProgress.value.stage = `Finalizing ${levelNames[level]}...`
+      
+      if (!levelData || !Array.isArray(levelData) || levelData.length === 0) {
+        const errorMsg = `No data loaded for ${level} level from ${filePath}. File may be empty or invalid.`
+        console.error(`[Census Store] ${errorMsg}`)
+        throw new Error(errorMsg)
+      }
+      
       data.value[level] = levelData
       dataCache.value.set(cacheKey, levelData)
+      filterCache.value.clear()
+      
+      if (import.meta.env.DEV) {
+        console.log(`[Census Store] ${levelNames[level]} data loaded and cached: ${levelData.length} rows`)
+      }
 
-      loadingProgress.value = { loaded: levelData.length, total: levelData.length, percentage: 100, stage: 'Complete' }
+      loadingProgress.value = { loaded: levelData.length, total: levelData.length, percentage: 100, stage: `${levelNames[level]} loaded` }
       
       return levelData
     } catch (error) {
       console.error(`Failed to load ${level} dataset:`, error)
-      loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: 'Error occurred' }
+      loadingProgress.value = { loaded: 0, total: 0, percentage: 0, stage: `Failed to load ${levelNames[level]}` }
       throw error
     } finally {
       levelLoadingState.value[level] = false
@@ -362,29 +364,29 @@ export const useCensusStore = defineStore('census', () => {
 
   const loadDataset = async (filename) => {
     const baseName = filename.replace('.csv', '')
+    console.log(`[Census Store] Loading dataset: ${filename} (base: ${baseName})`)
     
-    const hasState = dataCache.value.has(`${baseName}_state`)
-    const hasCounty = dataCache.value.has(`${baseName}_county`)
-    const hasZcta5 = dataCache.value.has(`${baseName}_zcta5`)
+    const cacheKeyState = `${baseName}_state`
+    const cacheKeyCounty = `${baseName}_county`
+    const cacheKeyZcta5 = `${baseName}_zcta5`
+    
+    const hasState = dataCache.value.has(cacheKeyState)
+    const hasCounty = dataCache.value.has(cacheKeyCounty)
+    const hasZcta5 = dataCache.value.has(cacheKeyZcta5)
     
     if (hasState && hasCounty && hasZcta5) {
       data.value = {
-        state: dataCache.value.get(`${baseName}_state`),
-        county: dataCache.value.get(`${baseName}_county`),
-        zcta5: dataCache.value.get(`${baseName}_zcta5`)
+        state: dataCache.value.get(cacheKeyState),
+        county: dataCache.value.get(cacheKeyCounty),
+        zcta5: dataCache.value.get(cacheKeyZcta5)
       }
+      filterCache.value.clear()
       return data.value
     }
 
-    if (hasState) {
-      data.value.state = dataCache.value.get(`${baseName}_state`)
-    }
-    if (hasCounty) {
-      data.value.county = dataCache.value.get(`${baseName}_county`)
-    }
-    if (hasZcta5) {
-      data.value.zcta5 = dataCache.value.get(`${baseName}_zcta5`)
-    }
+    if (hasState) data.value.state = dataCache.value.get(cacheKeyState)
+    if (hasCounty) data.value.county = dataCache.value.get(cacheKeyCounty)
+    if (hasZcta5) data.value.zcta5 = dataCache.value.get(cacheKeyZcta5)
 
     isLoading.value = true
 
@@ -416,23 +418,15 @@ export const useCensusStore = defineStore('census', () => {
 
   const sortData = (dataset) => {
     if (!sortColumn.value || !dataset) return dataset
-
     return [...dataset].sort((a, b) => {
       const aVal = a[sortColumn.value]
       const bVal = b[sortColumn.value]
-
       if (typeof aVal === 'number' && typeof bVal === 'number') {
         return sortDirection.value === 'asc' ? aVal - bVal : bVal - aVal
       }
-
       const aStr = String(aVal).toLowerCase()
       const bStr = String(bVal).toLowerCase()
-
-      if (sortDirection.value === 'asc') {
-        return aStr.localeCompare(bStr)
-      } else {
-        return bStr.localeCompare(aStr)
-      }
+      return sortDirection.value === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr)
     })
   }
 
@@ -454,7 +448,6 @@ export const useCensusStore = defineStore('census', () => {
       currentLevel.value = 'county'
       sortColumn.value = null
       sortDirection.value = 'asc'
-      
       if (currentDataset.value && !data.value.county) {
         try {
           await loadDatasetLevel(currentDataset.value, 'county')
@@ -462,10 +455,7 @@ export const useCensusStore = defineStore('census', () => {
           console.error('Failed to preload county data:', error)
         }
       }
-      
-      setTimeout(() => {
-        isLevelTransitioning.value = false
-      }, 300)
+      setTimeout(() => { isLevelTransitioning.value = false }, 300)
     }, 200)
   }
 
@@ -477,7 +467,6 @@ export const useCensusStore = defineStore('census', () => {
       currentLevel.value = 'zcta5'
       sortColumn.value = null
       sortDirection.value = 'asc'
-      
       if (currentDataset.value && !data.value.zcta5) {
         try {
           await loadDatasetLevel(currentDataset.value, 'zcta5')
@@ -485,10 +474,7 @@ export const useCensusStore = defineStore('census', () => {
           console.error('Failed to preload zcta5 data:', error)
         }
       }
-      
-      setTimeout(() => {
-        isLevelTransitioning.value = false
-      }, 300)
+      setTimeout(() => { isLevelTransitioning.value = false }, 300)
     }, 200)
   }
 
@@ -506,9 +492,7 @@ export const useCensusStore = defineStore('census', () => {
       }
       sortColumn.value = null
       sortDirection.value = 'asc'
-      setTimeout(() => {
-        isLevelTransitioning.value = false
-      }, 300)
+      setTimeout(() => { isLevelTransitioning.value = false }, 300)
     }, 200)
   }
 
@@ -558,41 +542,32 @@ export const useCensusStore = defineStore('census', () => {
   }
   
   const resetFilters = () => {
-    if (currentLevel.value === 'state' && data.value.state) {
+    const f = dimensionFilters
+    if (currentLevel.value === 'state' && data.value.state?.length) {
       const allStates = [...new Set(data.value.state.map(d => d.state_name).filter(Boolean))]
-      dimensionFilters.selectedStates = allStates.length > 0 ? [...allStates] : []
-      dimensionFilters.selectedRegions = []
-      dimensionFilters.selectedDivisions = []
-    } else if (currentLevel.value === 'county' && data.value.county) {
+      f.selectedStates = allStates.length ? [...allStates] : []
+      f.selectedRegions = []
+      f.selectedDivisions = []
+    } else if (currentLevel.value === 'county' && data.value.county?.length) {
       const countyData = data.value.county.filter(d => d.state_name === currentState.value)
-      const allCDs = [...new Set(countyData.map(d => d.congressional_district || d.cd116 || '').filter(Boolean))]
-      const allAiannh = [...new Set(countyData.map(d => d.aiannh_name || 'N/A').filter(a => a && a !== 'N/A'))]
-      const allUR = [...new Set(countyData.map(d => d.urban_rural || 'N/A').filter(ur => ur && ur !== 'N/A'))]
-      const allMetros = [...new Set(countyData.map(d => d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)).filter(Boolean))]
-      
-      dimensionFilters.selectedCongressionalDistricts = allCDs.length > 0 ? [...allCDs] : []
-      dimensionFilters.selectedAiannh = allAiannh.length > 0 ? [...allAiannh] : []
-      dimensionFilters.selectedUrbanRural = allUR.length > 0 ? [...allUR] : []
-      dimensionFilters.selectedMetroAreas = allMetros.length > 0 ? [...allMetros] : []
-    } else if (currentLevel.value === 'zcta5' && data.value.zcta5) {
+      f.selectedCongressionalDistricts = [...new Set(countyData.map(d => d.congressional_district || d.cd116 || '').filter(Boolean))]
+      f.selectedAiannh = [...new Set(countyData.map(d => d.aiannh_name || 'N/A').filter(a => a && a !== 'N/A'))]
+      f.selectedUrbanRural = [...new Set(countyData.map(d => d.urban_rural || 'N/A').filter(ur => ur && ur !== 'N/A'))]
+      f.selectedMetroAreas = [...new Set(countyData.map(d => d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)).filter(Boolean))]
+    } else if (currentLevel.value === 'zcta5' && data.value.zcta5?.length) {
       const zcta5Data = data.value.zcta5.filter(d => 
         d.state_name === currentState.value && d.county_name === currentCounty.value
       )
-      const allAiannh = [...new Set(zcta5Data.map(d => d.aiannh_name || 'N/A').filter(a => a && a !== 'N/A'))]
-      const allUR = [...new Set(zcta5Data.map(d => d.urban_rural || 'N/A').filter(ur => ur && ur !== 'N/A'))]
-      const allMetros = [...new Set(zcta5Data.map(d => d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)).filter(Boolean))]
-      
-      dimensionFilters.selectedAiannh = allAiannh.length > 0 ? [...allAiannh] : []
-      dimensionFilters.selectedUrbanRural = allUR.length > 0 ? [...allUR] : []
-      dimensionFilters.selectedMetroAreas = allMetros.length > 0 ? [...allMetros] : []
+      f.selectedAiannh = [...new Set(zcta5Data.map(d => d.aiannh_name || 'N/A').filter(a => a && a !== 'N/A'))]
+      f.selectedUrbanRural = [...new Set(zcta5Data.map(d => d.urban_rural || 'N/A').filter(ur => ur && ur !== 'N/A'))]
+      f.selectedMetroAreas = [...new Set(zcta5Data.map(d => d.urban_area_name || (d.cbsa_code ? `CBSA: ${d.cbsa_code}` : null)).filter(Boolean))]
     }
-    
-    dimensionFilters.populationMin = null
-    dimensionFilters.populationMax = null
-    dimensionFilters.areaMin = null
-    dimensionFilters.areaMax = null
-    dimensionFilters.metricValueMin = null
-    dimensionFilters.metricValueMax = null
+    f.populationMin = null
+    f.populationMax = null
+    f.areaMin = null
+    f.areaMax = null
+    f.metricValueMin = null
+    f.metricValueMax = null
   }
 
   let filterTimeout = null
@@ -609,26 +584,30 @@ export const useCensusStore = defineStore('census', () => {
     dimensionFilters.areaMin,
     dimensionFilters.areaMax,
     dimensionFilters.metricValueMin,
-    dimensionFilters.metricValueMax
+    dimensionFilters.metricValueMax,
+    searchQuery.value,
+    currentLevel.value,
+    currentMetric.value
   ], () => {
     if (filterTimeout) clearTimeout(filterTimeout)
     isFiltering.value = true
+    filterCache.value.clear()
     filterTimeout = setTimeout(() => {
       isFiltering.value = false
       filterTimeout = null
-    }, 150)
+    }, 100)
   }, { deep: true })
 
   const preloadNextLevel = async () => {
     if (!currentDataset.value) return
-    
-    if (currentLevel.value === 'state' && !data.value.county && !levelLoadingState.value.county) {
+    const level = currentLevel.value
+    if (level === 'state' && !data.value.county && !levelLoadingState.value.county) {
       try {
         await loadDatasetLevel(currentDataset.value, 'county')
       } catch (error) {
         console.error('Failed to preload county data:', error)
       }
-    } else if (currentLevel.value === 'county' && currentState.value && !data.value.zcta5 && !levelLoadingState.value.zcta5) {
+    } else if (level === 'county' && currentState.value && !data.value.zcta5 && !levelLoadingState.value.zcta5) {
       try {
         await loadDatasetLevel(currentDataset.value, 'zcta5')
       } catch (error) {
@@ -639,7 +618,6 @@ export const useCensusStore = defineStore('census', () => {
 
   watch(() => currentLevel.value, async (newLevel) => {
     if (!currentDataset.value) return
-    
     if (newLevel === 'county' && !data.value.county && !levelLoadingState.value.county) {
       try {
         await loadDatasetLevel(currentDataset.value, 'county')
@@ -663,13 +641,13 @@ export const useCensusStore = defineStore('census', () => {
 
   watch(() => currentDataset.value, async (newDataset) => {
     if (!newDataset) return
-    
-    if (currentLevel.value === 'state' && !data.value.state) {
+    const level = currentLevel.value
+    if (level === 'state' && !data.value.state) {
       await loadDatasetLevel(newDataset, 'state')
-    } else if (currentLevel.value === 'county') {
+    } else if (level === 'county') {
       if (!data.value.state) await loadDatasetLevel(newDataset, 'state')
       if (!data.value.county) await loadDatasetLevel(newDataset, 'county')
-    } else if (currentLevel.value === 'zcta5') {
+    } else if (level === 'zcta5') {
       if (!data.value.state) await loadDatasetLevel(newDataset, 'state')
       if (!data.value.county) await loadDatasetLevel(newDataset, 'county')
       if (!data.value.zcta5) await loadDatasetLevel(newDataset, 'zcta5')

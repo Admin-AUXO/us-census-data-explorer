@@ -67,7 +67,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useCensusStore } from '../stores/census'
+import { useCensusStore } from '../../stores/census'
 import { ChevronLeft, ChevronRight, Globe, MapPin, Building, Map, Layers } from 'lucide-vue-next'
 
 const store = useCensusStore()

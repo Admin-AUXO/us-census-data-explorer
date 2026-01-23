@@ -1,0 +1,16 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "declaration-no-important": null,
+    "property-no-vendor-prefix": null,
+    "value-no-vendor-prefix": null,
+    "keyframes-name-pattern": null,
+    "no-descending-specificity": null,
+    "media-feature-name-value-no-unknown": null,
+    "declaration-block-single-line-max-declarations": null,
+    "selector-pseudo-class-no-unknown": [true, {
+      "ignorePseudoClasses": ["deep", "global"]
+    }]
+  },
+  "ignoreFiles": ["**/*.js", "**/*.vue", "node_modules/**", "dist/**", "src/assets/**"]
+}

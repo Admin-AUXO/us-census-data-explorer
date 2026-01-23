@@ -889,7 +889,9 @@
   .data-table th {
     padding: 0.375rem 0.375rem !important;
     font-size: 0.6875rem !important;
-    white-space: nowrap !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
     min-width: 70px !important;
     font-weight: var(--font-weight-semibold) !important;
     text-transform: uppercase !important;
@@ -897,6 +899,11 @@
     text-align: center !important;
     vertical-align: middle !important;
     line-height: 1.2 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   .data-table th.col-abbr {
@@ -957,6 +964,11 @@
     line-height: 1.2 !important;
     text-align: left !important;
     vertical-align: middle !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   .data-table td {
@@ -1052,9 +1064,26 @@
     vertical-align: middle !important;
   }
 
+  .data-table tbody tr {
+    transition: background-color var(--duration-fast) var(--easing-standard) !important;
+    will-change: background-color !important;
+  }
+
+  .data-table tbody tr:hover {
+    background: var(--bg-surface) !important;
+  }
+
   .data-table tbody tr:hover td.col-state,
   .data-table tbody tr:hover td.primary-col {
     background: var(--bg-surface) !important;
+  }
+
+  .data-table tbody tr.drillable {
+    cursor: pointer !important;
+  }
+
+  .data-table tbody tr.drillable:hover {
+    background: var(--accent-green-opacity-10) !important;
   }
 
   .data-table tbody tr.drillable:hover td.col-state,

@@ -58,7 +58,6 @@
 
 .data-table tbody tr:hover {
   background: var(--bg-surface);
-  transform: translateX(2px);
 }
 
 .data-table tbody tr.drillable {

@@ -24,7 +24,7 @@
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  padding: 0 clamp(var(--spacing-md), 4vw, var(--spacing-3xl));
+  padding: 0 var(--spacing-sm);
 }
 
 .data-container {
@@ -37,7 +37,7 @@
 }
 
 .table-wrapper {
-  padding: clamp(var(--spacing-md), 2vw, var(--spacing-xl));
+  padding: var(--spacing-sm);
   width: 100%;
   overflow-x: auto;
 }

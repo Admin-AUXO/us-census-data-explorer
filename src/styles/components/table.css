@@ -71,7 +71,7 @@
 }
 
 .data-table td {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   color: var(--text-primary);
   font-weight: var(--font-weight-medium);
   text-align: center;
@@ -220,9 +220,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
   border-bottom: var(--border-width-md) solid var(--border-color);
+  width: 100%;
 }
 
 .table-header h2 {

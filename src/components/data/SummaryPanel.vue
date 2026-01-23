@@ -582,7 +582,9 @@ const trendInfo = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
+  padding: var(--spacing-md) var(--spacing-sm);
+  width: 100%;
+  box-sizing: border-box;
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border-color);
 }
@@ -629,7 +631,9 @@ const trendInfo = computed(() => {
 }
 
 .summary-content {
-  padding: 2rem;
+  padding: var(--spacing-md) var(--spacing-sm);
+  width: 100%;
+  box-sizing: border-box;
   background: var(--bg-card);
 }
 

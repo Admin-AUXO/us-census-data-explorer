@@ -129,9 +129,12 @@
 }
 
 .header-filters-bar {
-  padding: var(--spacing-md) clamp(var(--spacing-md), 4vw, var(--spacing-3xl));
+  padding: var(--spacing-md) var(--spacing-sm);
   border-top: var(--border-width-sm) solid var(--border-color);
   transition: max-height var(--duration-normal) var(--easing-standard);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .header-filters-bar.collapsed {

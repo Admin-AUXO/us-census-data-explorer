@@ -19,34 +19,34 @@
 
 @media (width >= 1920px) {
   .container {
-    padding: 0 clamp(var(--spacing-xl), 5vw, var(--spacing-4xl));
+    padding: 0 var(--spacing-md);
   }
 
   .header-top,
   .header-nav,
   .header-filters-bar {
-    padding-left: clamp(var(--spacing-xl), 5vw, var(--spacing-4xl));
-    padding-right: clamp(var(--spacing-xl), 5vw, var(--spacing-4xl));
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
   }
 
   .footer-container {
-    padding: 0 clamp(var(--spacing-xl), 5vw, var(--spacing-4xl));
+    padding: 0 var(--spacing-md);
   }
 }
 
 @media (width >= 2560px) {
   .container {
-    padding: 0 clamp(var(--spacing-3xl), 6vw, 6rem);
+    padding: 0 var(--spacing-lg);
   }
 
   .header-top,
   .header-nav,
   .header-filters-bar {
-    padding-left: clamp(var(--spacing-3xl), 6vw, 6rem);
-    padding-right: clamp(var(--spacing-3xl), 6vw, 6rem);
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
   }
 
   .footer-container {
-    padding: 0 clamp(var(--spacing-3xl), 6vw, 6rem);
+    padding: 0 var(--spacing-lg);
   }
 }

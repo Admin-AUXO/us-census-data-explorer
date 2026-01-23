@@ -30,6 +30,13 @@
   flex-shrink: 0;
 }
 
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
 .header-brand > :deep(.auxo-logo-container) {
   margin: 0;
   padding: 0;

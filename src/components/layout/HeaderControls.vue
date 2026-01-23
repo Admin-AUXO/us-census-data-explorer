@@ -3,9 +3,11 @@
     <div class="header-container">
       <div class="header-top">
         <div class="header-brand">
-          <AuxoLogo size="small" />
-          <div class="brand-separator"></div>
-          <h1 class="app-title">USA Census Data Explorer</h1>
+          <div class="brand-row">
+            <AuxoLogo size="small" />
+            <div class="brand-separator"></div>
+            <h1 class="app-title">USA Census Data Explorer</h1>
+          </div>
           <div class="header-breadcrumbs">
             <button
               v-if="store.currentLevel !== 'state'"

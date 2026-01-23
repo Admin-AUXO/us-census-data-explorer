@@ -512,7 +512,10 @@ export const useCensusStore = defineStore('census', () => {
       }
       sortColumn.value = null
       sortDirection.value = 'asc'
-      setTimeout(() => { isLevelTransitioning.value = false }, 300)
+      setTimeout(() => {
+        resetFilters()
+        isLevelTransitioning.value = false
+      }, 100)
     }, 200)
   }
 
@@ -522,6 +525,7 @@ export const useCensusStore = defineStore('census', () => {
     currentCounty.value = null
     sortColumn.value = null
     sortDirection.value = 'asc'
+    resetFilters()
   }
 
   const savePreferences = () => {

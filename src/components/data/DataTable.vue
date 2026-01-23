@@ -357,6 +357,9 @@ const getChangeClass = (row) => {
 
 const getChildCount = (row) => {
   if (store.currentLevel === 'state') {
+    if (row.county_count !== undefined && row.county_count !== null) {
+      return row.county_count
+    }
     const key = `state_${row.state_name}`
     if (childCountCache.value.has(key)) {
       return childCountCache.value.get(key)
@@ -384,12 +387,15 @@ const getChildCount = (row) => {
 
 const getZipCount = (row) => {
   if (store.currentLevel === 'state') {
+    if (row.zcta5_count !== undefined && row.zcta5_count !== null) {
+      return row.zcta5_count
+    }
     const key = `zip_${row.state_name}`
     if (zipCountCache.value.has(key)) {
       return zipCountCache.value.get(key)
     }
     if (!store.data.zcta5 || store.data.zcta5.length === 0) {
-      return 'N/A'
+      return 0
     }
     const count = store.data.zcta5.filter(z => z.state_name === row.state_name).length
     const result = count > 0 ? count : 0

@@ -842,8 +842,9 @@
 
   .data-table thead {
     position: sticky !important;
-    top: 0 !important;
+    top: calc(var(--header-height-mobile, 120px) + 60px) !important;
     z-index: 10 !important;
+    background: var(--bg-elevated) !important;
   }
 
   .data-table th {
@@ -912,6 +913,14 @@
     margin-bottom: 0.75rem !important;
     padding-bottom: 0.5rem !important;
     width: 100% !important;
+    position: sticky !important;
+    top: calc(var(--header-height-mobile, 120px)) !important;
+    z-index: 9 !important;
+    background: var(--bg-card) !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+    border-bottom: var(--border-width-sm) solid var(--border-color) !important;
   }
 
   .table-header h2 {

@@ -240,8 +240,27 @@ onMounted(async () => {
   if (!store.manifest) {
     try {
       await store.loadManifest()
+      const prefs = store.loadPreferences()
+      if (prefs?.dataset && store.manifest?.datasets?.find(d => d.source_file === prefs.dataset)) {
+        selectedDataset.value = prefs.dataset
+        await onDatasetChange()
+      } else if (store.manifest?.datasets?.length > 0 && !selectedDataset.value) {
+        const firstDataset = store.manifest.datasets[0].source_file
+        selectedDataset.value = firstDataset
+        await onDatasetChange()
+      }
     } catch (error) {
       console.error('Failed to load manifest on mount:', error)
+    }
+  } else {
+    const prefs = store.loadPreferences()
+    if (prefs?.dataset && store.manifest?.datasets?.find(d => d.source_file === prefs.dataset)) {
+      selectedDataset.value = prefs.dataset
+      await onDatasetChange()
+    } else if (store.manifest?.datasets?.length > 0 && !selectedDataset.value) {
+      const firstDataset = store.manifest.datasets[0].source_file
+      selectedDataset.value = firstDataset
+      await onDatasetChange()
     }
   }
 })

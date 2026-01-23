@@ -11,17 +11,23 @@ export const useFilters = () => {
 
   const availableYears = computed(() => {
     if (!store.data.state?.length) {
-      console.warn('[Filters] No state data available to extract years')
+      if (store.currentDataset && !store.isLoading && import.meta.env.DEV) {
+        console.warn('[Filters] No state data available to extract years')
+      }
       return []
     }
     const firstRow = store.data.state[0]
     if (!firstRow || typeof firstRow !== 'object') {
-      console.warn('[Filters] Cannot extract years: invalid first row')
+      if (store.currentDataset && import.meta.env.DEV) {
+        console.warn('[Filters] Cannot extract years: invalid first row')
+      }
       return []
     }
     const columns = Object.keys(firstRow)
     if (!columns.length) {
-      console.warn('[Filters] Cannot extract years: no columns found')
+      if (store.currentDataset && import.meta.env.DEV) {
+        console.warn('[Filters] Cannot extract years: no columns found')
+      }
       return []
     }
     const years = [...new Set(columns
@@ -29,7 +35,7 @@ export const useFilters = () => {
       .filter(Boolean)
     )].sort().reverse()
     
-    if (!years.length) {
+    if (!years.length && store.currentDataset) {
       console.error('[Filters] No years found. Columns:', columns.slice(0, 10))
     }
     

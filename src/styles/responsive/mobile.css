@@ -643,47 +643,67 @@
   }
 
   .summary-grid {
-    grid-template-columns: 1fr !important;
-    gap: 0.5rem !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.375rem !important;
   }
 
-  .summary-card {
-    padding: 0.75rem !important;
-    border-radius: var(--radius-md) !important;
+  .summary-card:not(.card-full) {
+    padding: 0.5rem !important;
+    border-radius: var(--radius-sm) !important;
+  }
+
+  .summary-card.card-full {
+    grid-column: 1 / -1 !important;
+    padding: 0.5rem !important;
+    border-radius: var(--radius-sm) !important;
   }
 
   .card-header {
-    margin-bottom: 0.5rem !important;
-    padding-bottom: 0.375rem !important;
-    gap: 0.375rem !important;
+    margin-bottom: 0.375rem !important;
+    padding-bottom: 0.25rem !important;
+    gap: 0.25rem !important;
   }
 
   .card-header svg {
-    width: 16px !important;
-    height: 16px !important;
+    width: 14px !important;
+    height: 14px !important;
   }
 
   .card-header h3 {
-    font-size: 0.8125rem !important;
+    font-size: 0.75rem !important;
     margin: 0 !important;
   }
 
+  .summary-card:not(.card-full) .card-header {
+    border-bottom: none !important;
+    margin-bottom: 0.25rem !important;
+    padding-bottom: 0 !important;
+  }
+
+  .card-content {
+    gap: 0.25rem !important;
+  }
+
+  .summary-card:not(.card-full) .card-content {
+    gap: 0.125rem !important;
+  }
+
   .metric-row {
-    padding: 0.375rem 0 !important;
-    gap: 0.375rem !important;
+    padding: 0.125rem 0 !important;
+    gap: 0.25rem !important;
     margin-bottom: 0 !important;
   }
 
   .metric-label {
-    font-size: 0.6875rem !important;
+    font-size: 0.625rem !important;
   }
 
   .metric-value {
-    font-size: 0.8125rem !important;
+    font-size: 0.75rem !important;
   }
 
   .metric-value.highlight {
-    font-size: 0.875rem !important;
+    font-size: 0.8125rem !important;
   }
 
   .trend-item {
@@ -730,6 +750,51 @@
   .location-rank {
     font-size: 0.6875rem !important;
     padding: 0.125rem 0.375rem !important;
+  }
+
+  .performers {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .performer-section {
+    gap: 0.5rem !important;
+  }
+
+  .performer-label {
+    font-size: 0.75rem !important;
+    gap: 0.375rem !important;
+  }
+
+  .performer-label svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .performer-list {
+    gap: 0.375rem !important;
+  }
+
+  .performer-item {
+    grid-template-columns: auto 1fr auto !important;
+    gap: 0.375rem !important;
+    padding: 0.375rem 0.5rem !important;
+  }
+
+  .performer-item .rank {
+    font-size: 0.625rem !important;
+  }
+
+  .performer-item .name {
+    font-size: 0.6875rem !important;
+  }
+
+  .performer-item .value {
+    font-size: 0.75rem !important;
+  }
+
+  .performer-change {
+    display: none !important;
   }
 
   .main-content {

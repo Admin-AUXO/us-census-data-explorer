@@ -107,7 +107,8 @@
   --z-index-modal: 2500;
   --z-index-sidebar-overlay: 3000;
   --z-index-sidebar-panel: 3001;
-  --z-index-level-transition: 2000;
+  --z-index-level-transition: 4000;
+  --z-index-loading-modal: 4000;
   --size-xs: 0.5rem;
   --size-sm: 0.75rem;
   --size-md: 1rem;

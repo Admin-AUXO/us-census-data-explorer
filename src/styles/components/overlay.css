@@ -3,11 +3,12 @@
   inset: 0;
   background: rgb(0 0 0 / 70%);
   backdrop-filter: blur(var(--blur-sm));
-  z-index: var(--z-index-level-transition);
+  z-index: var(--z-index-loading-modal);
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: auto;
+  isolation: isolate;
 }
 
 .transition-loader {
@@ -116,11 +117,12 @@
   inset: 0;
   background: rgb(0 0 0 / 50%);
   backdrop-filter: blur(var(--blur-md));
-  z-index: var(--z-index-overlay);
+  z-index: var(--z-index-loading-modal);
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: auto;
+  isolation: isolate;
 }
 
 .filtering-loader {

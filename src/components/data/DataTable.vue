@@ -48,8 +48,8 @@
           <div class="filtering-loader">
             <div class="filtering-spinner"></div>
             <div class="filtering-content">
-              <span class="filtering-text">Filtering data...</span>
-              <span class="filtering-subtext">Updating results</span>
+              <span class="filtering-text">Applying Filters</span>
+              <span class="filtering-subtext">Updating table results...</span>
             </div>
           </div>
         </div>
@@ -501,19 +501,16 @@ const exportCSV = () => {
 }
 
 .filtering-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(var(--blur-md));
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: var(--z-index-overlay);
-  border-radius: var(--radius-md);
+  z-index: var(--z-index-loading-modal);
   animation: fadeIn 0.2s var(--easing-standard);
+  isolation: isolate;
 }
 
 .filtering-loader {

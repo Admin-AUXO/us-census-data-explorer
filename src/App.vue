@@ -6,7 +6,7 @@
     <DimensionFilters :is-open="filtersOpen" @close="filtersOpen = false" />
 
     <Transition name="fade">
-      <div v-if="store.isLoading && store.loadingProgress.stage" class="level-transition-overlay">
+      <div v-if="store.isLoading" class="level-transition-overlay">
         <div class="transition-loader">
           <div class="loader-spinner"></div>
           <div class="loader-content">
@@ -141,7 +141,7 @@ const updateScrollTracker = () => {
 }
 
 const transitionMessage = computed(() => {
-  if (!store.isLoading) return ''
+  if (!store.isLoading) return 'Loading...'
   if (store.loadingProgress.stage) {
     return store.loadingProgress.stage
   }
